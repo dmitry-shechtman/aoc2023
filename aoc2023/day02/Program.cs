@@ -23,7 +23,7 @@ namespace aoc.aoc2023.day02
             games.Sum(game => game.Sets.All(set =>
                 !set.Any(kvp => kvp.Value > Cubes[kvp.Key])) ? game.Id : 0);
 
-        private static long Part2(Game[] games) =>
+        private static int Part2(Game[] games) =>
             games.Sum(game => Cubes.Keys.Product(key =>
                 game.Sets.Max(set => set.GetValueOrDefault(key))));
 
