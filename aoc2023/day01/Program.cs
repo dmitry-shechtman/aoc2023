@@ -28,11 +28,11 @@ namespace aoc.aoc2023.day01
         private static int GetFirst(string s) =>
             Digits.Select((t, v) => (v, s.Contains(t) ? s.IndexOf(t) : s.Length))
                 .OrderBy(t => t.Item2)
-                .FirstOrDefault().v % 10;
+                .First().v % 10;
 
         private static int GetLast(string s) =>
             Digits.Select((t, v) => (v, s.LastIndexOf(t)))
                 .OrderByDescending(t => t.Item2)
-                .FirstOrDefault().v % 10;
+                .First().v % 10;
     }
 }
