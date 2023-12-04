@@ -14,7 +14,7 @@ namespace aoc.aoc2023.day04
         }
 
         private static int Part1(int[] input) =>
-            input.Sum(c => c > 0 ? 1 << (c - 1) : 0);
+            input.Sum(c => 1 << c >> 1);
 
         private static int Part2(int[] input)
         {
