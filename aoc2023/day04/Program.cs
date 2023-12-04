@@ -20,7 +20,7 @@ namespace aoc.aoc2023.day04
         {
             var output = Enumerable.Repeat(1, input.Length).ToArray();
             for (int i = 0; i < input.Length; ++i)
-                for (int j = 1; j <= input[i] && i + j < input.Length; ++j)
+                for (int j = 1; j <= input[i]; ++j)
                     output[i + j] += output[i];
             return output.Sum();
         }
