@@ -9,8 +9,8 @@ So our [problem](https://adventofcode.com/2023/day/5) could be broken down into 
 
 0. [Defining the types](#Types),
 1. [Parsing the almanac](#Parsing),
-2. [Solving for a collection of numbers](#PartOne), and
-3. [Solving for a collection of ranges](#PartTwo)
+2. [Solving for a collection of numbers](#Part-One), and
+3. [Solving for a collection of ranges](#Part-Two)
 
 
 ## Types
@@ -176,7 +176,6 @@ Our top-level `Parse` method returns both *seeds* and *maps* as a tuple:
 We're done with parsing, Little Eli!
 Moving on to solving
 
-#PartOne
 ## Part One
 
 
@@ -247,7 +246,6 @@ the source range start:
 Simple, isn't, little Eli?
 Now, to slightly more compicated stuff...
 
-#PartTwo
 ## Part Two
 
 
