@@ -9,8 +9,8 @@ So our [problem](https://adventofcode.com/2023/day/5) could be broken down into 
 
 0. [Defining the types](#Types),
 1. [Parsing the almanac](#Parsing),
-2. [Solving for a collection of numbers](#Part One), and
-3. [Solving for a collection of ranges](#Part Two)
+2. [Solving for a collection of numbers](#PartOne), and
+3. [Solving for a collection of ranges](#PartTwo)
 
 
 ## Types
@@ -18,7 +18,7 @@ So our [problem](https://adventofcode.com/2023/day/5) could be broken down into 
 
 The almanac has two types of records:
 
-1. **seeds**, which may be represented as an array of 64-bit integers, i.e. `long[]` and
+1. **seeds**, which may be represented as an array of 64-bit integers, i.e., `long[]`, and
 2. **maps**.
 
 
@@ -66,6 +66,7 @@ We need to define a constructor:
             Min = min;
             Max = max;
         }
+```
 
 and a method to initialize an instance from *start* and *length*:
 
@@ -104,7 +105,7 @@ We find all the places where two LFs appear together and split the tape along th
   8. humidity-to-location map
 
 See how all those pieces have numbers separated by space characters?
-Let's split those, parse each one into `long`, and make an array:
+Let's split those, parse each one into a `long`, and make an array:
 
 ```C#
     private static long[] ParseInt64s(string s) =>
@@ -112,7 +113,7 @@ Let's split those, parse each one into `long`, and make an array:
 ```
 
 We parse the *seeds* by splitting the first piece of tape at `:`,
-throwing the first part away and passing the second part to `ParseInt64s()`:
+throwing the first part away, and passing the second part to `ParseInt64s()`:
 
 ```C#
 ParseInt64s(ss[0].Split(": ")[1]
@@ -129,7 +130,7 @@ Well, remember those line feed markers?
 We use those to split each of the map pieces (after throwing away any LFs from the edges).
 We end up with many smaller pieces.
 Let's throw away the first one (it just contains the name of the map, nothing important!).
-Now, let's feed each of the remaining ones to the entry parser and make an array, again:
+Now, let's feed each of the remaining small pieces to the entry parser and make an array:
 
 ```C#
     record Map //...
@@ -153,9 +154,9 @@ As for the entry parser, it's very simple:
 
 An overloaded constructor
 * takes the resulting array,
-* creates the source range from the second and the third element
-* creates the destination range from the first and the third element,
-* and passes those to the auto-generated constructor:
+* creates the *source range* from the second and the third element,
+* creates the *destination range* from the first and the third element, and
+* passes those to the auto-generated constructor:
 
 ```C#
     Entry(long[] v) : this(
@@ -192,7 +193,7 @@ In order to find the minimum for each seed, we aggregate the minima across all t
         maps.Aggregate(seed, Min);
 ```
 
-See how `seed` is passed as `Aggregate()`'s '`seed`?
+See how `seed` is passed as `Aggregate()`'s `seed`?
 I bet Eric had this exact thing in mind when he created the puzzle!
 
 Now, in order to find the minimum given a *value* and a *map*, we first attempt to transform the value.
@@ -204,7 +205,7 @@ Otherwise, we simply return the current value.
         map.Transform(value).Any() ? map.Transform(value).Min() : value;
 ```
 
-A *map* transforms a *value* by passing it to every entry that has matching source ranges:
+A *map* transforms a *value* by passing it to all entries with matching source ranges:
 
 ```C#
     record Map //...
@@ -229,8 +230,8 @@ A *range* matches a *value* by checking whether it, well, falls within the range
 ```
 
 Finally, an *entry* transforms a *value* by
-adding the destination range start and
-subtracting the source range start:
+adding to it the destination range start minus
+the source range start:
 
 ```C#
     record Entry //...
@@ -248,12 +249,13 @@ Now, to slightly more compicated stuff...
 ## Part Two
 
 
-Instead of values, we now have ranges.
+We now have *ranges* rather than *values*.
+
 In order to group the numbers into pairs, we use `Chunk(2)`.
 It's a really simple extension method, so we won't be explaining it.
 We get a collection of arrays, which we pass to our good friend `FromMinLength()`.
-We then pass the resulting seed ranges as the `seed` (see? again!) to an `Aggregate()` of transforms across all the maps.
-Finally, we take the minimum across the final ranges' minima:
+We then pass the resulting seed ranges as the `seed` *(see? again!)* to an `Aggregate()` of transforms across all the maps.
+Finally, we find the minimum across the final ranges' minima:
 
 ```C#
     long Part2(long[] seeds, Map[] maps) =>
@@ -276,7 +278,7 @@ Transforming a single *range* via a *map* is similar to what we'd done in Part O
         map.Transform(range).Any() ? map.Transform(range) : new[] { range };
 ```
 
-A *map* transforms a *range* by passing it to every entry that has matching source ranges:
+A *map* transforms a *range* by passing it to all entries with matching source ranges:
 
 ```C#
     record Map //...
