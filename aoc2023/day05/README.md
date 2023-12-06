@@ -176,7 +176,7 @@ Our top-level `Parse` method returns both *seeds* and *maps* as a tuple:
 We're done with parsing, Little Eli!
 Moving on to solving
 
-## Part One
+##PartOne Part One
 
 
 We're looking for the minimum location number for all the seeds:
@@ -246,7 +246,7 @@ the source range start:
 Simple, isn't, little Eli?
 Now, to slightly more compicated stuff...
 
-## Part Two
+##PartTwo Part Two
 
 
 We now have *ranges* rather than *values*.
