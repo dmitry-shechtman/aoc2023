@@ -8,8 +8,8 @@ namespace aoc.aoc2023.day01
     {
         private static readonly string[] Digits =
         {
-            "0",    "1",   "2",   "3",     "4",    "5",    "6",   "7",     "8",     "9",
-            "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"
+            "1",   "2",   "3",     "4",    "5",    "6",   "7",     "8",     "9",
+            "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"
         };
 
         static void Main(string[] args)
@@ -28,11 +28,11 @@ namespace aoc.aoc2023.day01
         private static int GetFirst(string s) =>
             Digits.Select((t, v) => (v, s.Contains(t) ? s.IndexOf(t) : s.Length))
                 .OrderBy(t => t.Item2)
-                .First().v % 10;
+                .First().v % 9 + 1;
 
         private static int GetLast(string s) =>
             Digits.Select((t, v) => (v, s.LastIndexOf(t)))
                 .OrderByDescending(t => t.Item2)
-                .First().v % 10;
+                .First().v % 9 + 1;
     }
 }
