@@ -22,7 +22,7 @@ The almanac has two types of records:
 2. **maps**.
 
 
-Each map record consists of an array of entries:
+Each [map](https://github.com/dmitry-shechtman/aoc2023/blob/main/aoc2023/day05/Program.cs#L28) record consists of an array of entries:
 
 ```C#
     record Map(Entry[] Entries)
@@ -30,7 +30,7 @@ Each map record consists of an array of entries:
     }
 ```
 
-A map entry, in turn, consists of three numbers:
+A map [entry](https://github.com/dmitry-shechtman/aoc2023/blob/main/aoc2023/day05/Program.cs#L10), in turn, consists of three numbers:
 
 1. destination range start,
 2. source range start, and
@@ -45,7 +45,7 @@ So we'll define an entry as a pair of ranges:
 ```
 
 
-A range could be represented as *start* and *length*,
+A [range](https://github.com/dmitry-shechtman/aoc/blob/main/aoc/LongRange.cs) could be represented as *start* and *length*,
 but *start* and *end* are more convenient.
 You'll see why very soon.
 Let's call those `Min` and `Max` - we *are* looking for a minimum, after all!
@@ -252,7 +252,7 @@ Now, to slightly more compicated stuff...
 We now have *ranges* rather than *values*.
 
 In order to group the numbers into pairs, we use `Chunk(2)`.
-It's a really simple extension method, so we won't be explaining it.
+It's [a really simple extension method](https://github.com/dmitry-shechtman/aoc/blob/main/aoc/EnumerableExtensions.cs), so we won't be explaining it.
 We get a collection of arrays, which we pass to our good friend `FromMinLength()`.
 We then pass the resulting seed ranges as the `seed` *(see? again!)* to an `Aggregate()` of transforms across all the maps.
 Finally, we find the minimum across the final ranges' minima:
