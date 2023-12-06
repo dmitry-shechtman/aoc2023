@@ -7,10 +7,10 @@ No, not in my lap, people nowadays get the strangest ideas about such things!
 
 So our [problem](https://adventofcode.com/2023/day/5) could be broken down into four parts:
 
-0. [Defining the types](Types),
-1. [Parsing the almanac](Parsing),
-2. [Solving for a collection of numbers](Part One), and
-3. [Solving for a collection of ranges](Part Two)
+0. [Defining the types](#Types),
+1. [Parsing the almanac](#Parsing),
+2. [Solving for a collection of numbers](#Part One), and
+3. [Solving for a collection of ranges](#Part Two)
 
 
 ## Types
