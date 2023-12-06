@@ -49,9 +49,9 @@ namespace aoc.aoc2023.day05
             seeds.Min(seed => Min(seed, maps));
 
         private static long Part2(long[] seeds, Map[] maps) =>
-            seeds.Chunk(2)
-                .Select(LongRange.FromMinLength)
-                .Min(seed => maps.Aggregate(seed, Min).Min);
+            maps.Aggregate(
+                    seeds.Chunk(2).Select(LongRange.FromMinLength), Transform)
+                .Min(range => range.Min);
 
         private static long Min(long seed, Map[] maps) =>
             maps.Aggregate(seed, Min);
@@ -59,8 +59,11 @@ namespace aoc.aoc2023.day05
         private static long Min(long value, Map map) =>
             map.Transform(value).Any() ? map.Transform(value).Min() : value;
 
-        private static LongRange Min(LongRange range, Map map) =>
-            map.Transform(range).Any() ? map.Transform(range).OrderBy(r => r.Min).First() : range;
+        private static IEnumerable<LongRange> Transform(IEnumerable<LongRange> ranges, Map map) =>
+            ranges.SelectMany(range => Transform(range, map));
+
+        private static IEnumerable<LongRange> Transform(LongRange range, Map map) =>
+            map.Transform(range).Any() ? map.Transform(range) : new[] { range };
 
         private static (long[], Map[]) Parse(string[] ss) =>
             (ParseInt64s(ss[0].Split(": ")[1]), ss[1..].Select(Map.Parse).ToArray());
