@@ -34,12 +34,7 @@ namespace aoc.aoc2023.day07
                 .Select(g => g.Count())
                 .OrderBy(g => g)
                 .ToArray();
-            return group.Length switch
-            {
-                2 when group[^1] is 4 => 3,
-                3 when group[^1] is 3 => 5,
-                _ => group.Length * 2,
-            };
+            return group.Length * 5 - group[^1];
         }
 
         private static int GetType2(string hand) =>
