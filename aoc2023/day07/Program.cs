@@ -32,7 +32,7 @@ namespace aoc.aoc2023.day07
         {
             var group = hand.GroupBy(c => c)
                 .Select(g => g.Count())
-                .OrderBy(g => g)
+                .OrderBy(v => v)
                 .ToArray();
             return group.Length * 5 - group[^1];
         }
