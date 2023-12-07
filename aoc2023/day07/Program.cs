@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -6,7 +7,7 @@ namespace aoc.aoc2023.day07
 {
     class Program
     {
-        private const int Joker = 12;
+        private const char Joker = 'J';
 
         static void Main(string[] args)
         {
@@ -19,16 +20,15 @@ namespace aoc.aoc2023.day07
             Solve(hands, "AKQJT98765432", GetType);
 
         private static int Part2((string, int)[] hands) =>
-            Solve(hands, "AKQT98765432J", t => GetType(t, 0));
+            Solve(hands, "AKQT98765432J", GetType2);
 
-        private static int Solve((string hand, int bid)[] hands, string cards, Func<int[], int> getType) =>
+        private static int Solve((string hand, int bid)[] hands, string cards, Func<IEnumerable<char>, int> getType) =>
             hands
-                .Select(t => (hand: t.hand.Select(c => cards.IndexOf(c)).ToArray(), t.bid))
-                .OrderBy(t => getType(t.hand) << 20 | t.hand.Aggregate(0, (a, c) => a << 4 | c))
+                .OrderBy(t => getType(t.hand) << 20 | t.hand.Aggregate(0, (a, c) => a << 4 | cards.IndexOf(c)))
                 .Select((t, i) => t.bid * (hands.Length - i))
                 .Sum();
 
-        private static int GetType(int[] hand)
+        private static int GetType(IEnumerable<char> hand)
         {
             var group = hand.GroupBy(c => c)
                 .Select(g => g.Count())
@@ -42,21 +42,8 @@ namespace aoc.aoc2023.day07
             };
         }
 
-        private static int GetType(int[] hand, int index) =>
-            index == hand.Length
-                ? GetType(hand)
-                : hand[index] < Joker
-                    ? GetType(hand, index + 1)
-                    : Enumerable.Range(0, Joker)
-                        .Min(j => GetType(hand, index, j));
-
-        private static int GetType(int[] hand, int index, int card)
-        {
-            hand[index] = card;
-            int result = GetType(hand, index + 1);
-            hand[index] = Joker;
-            return result;
-        }
+        private static int GetType2(IEnumerable<char> hand) =>
+            hand.Min(c => GetType(hand.Select(d => d == Joker ? c : d)));
 
         private static (string, int)[] Parse(string path) =>
             File.ReadAllLines(path)
