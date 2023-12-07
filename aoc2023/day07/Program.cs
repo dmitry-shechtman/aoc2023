@@ -24,9 +24,12 @@ namespace aoc.aoc2023.day07
 
         private static int Solve((string hand, int bid)[] hands, string cards, Func<IEnumerable<char>, int> getType) =>
             hands
-                .OrderBy(t => getType(t.hand) << 20 | t.hand.Aggregate(0, (a, c) => a << 4 | cards.IndexOf(c)))
+                .OrderBy(t => getType(t.hand) << 20 | GetTieKey(t.hand, cards))
                 .Select((t, i) => t.bid * (hands.Length - i))
                 .Sum();
+
+        private static int GetTieKey(string hand, string cards) =>
+            hand.Aggregate(0, (a, c) => a << 4 | cards.IndexOf(c));
 
         private static int GetType(IEnumerable<char> hand)
         {
