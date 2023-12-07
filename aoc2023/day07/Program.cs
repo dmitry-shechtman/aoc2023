@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -7,8 +6,6 @@ namespace aoc.aoc2023.day07
 {
     class Program
     {
-        private const char Joker = 'J';
-
         static void Main(string[] args)
         {
             var hands = Parse(args[0]);
@@ -22,7 +19,7 @@ namespace aoc.aoc2023.day07
         private static int Part2((string, int)[] hands) =>
             Solve(hands, "AKQT98765432J", GetType2);
 
-        private static int Solve((string hand, int bid)[] hands, string cards, Func<IEnumerable<char>, int> getType) =>
+        private static int Solve((string hand, int bid)[] hands, string cards, Func<string, int> getType) =>
             hands
                 .OrderBy(t => getType(t.hand) << 20 | GetTieKey(t.hand, cards))
                 .Select((t, i) => t.bid * (hands.Length - i))
@@ -31,7 +28,7 @@ namespace aoc.aoc2023.day07
         private static int GetTieKey(string hand, string cards) =>
             hand.Aggregate(0, (a, c) => a << 4 | cards.IndexOf(c));
 
-        private static int GetType(IEnumerable<char> hand)
+        private static int GetType(string hand)
         {
             var group = hand.GroupBy(c => c)
                 .Select(g => g.Count())
@@ -45,8 +42,8 @@ namespace aoc.aoc2023.day07
             };
         }
 
-        private static int GetType2(IEnumerable<char> hand) =>
-            hand.Min(c => GetType(hand.Select(d => d == Joker ? c : d)));
+        private static int GetType2(string hand) =>
+            hand.Min(c => GetType(hand.Replace('J', c)));
 
         private static (string, int)[] Parse(string path) =>
             File.ReadAllLines(path)
