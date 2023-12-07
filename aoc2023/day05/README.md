@@ -252,8 +252,7 @@ Now, to slightly more compicated stuff...
 We now have *ranges* rather than *values*.
 
 In order to group the numbers into pairs, we use `Chunk(2)`.
-It's [a really simple extension method](https://github.com/dmitry-shechtman/aoc/blob/main/aoc/EnumerableExtensions.cs), so we won't be explaining it.
-We get a collection of arrays, which we pass to our good friend `FromMinLength()`.
+That gets us a collection of arrays, which we pass to our good friend `FromMinLength()`.
 We then pass the resulting seed ranges as the `seed` *(see? again!)* to an `Aggregate()` of transforms across all the maps.
 Finally, we find the minimum across the final ranges' minima:
 
