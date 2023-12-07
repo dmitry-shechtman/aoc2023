@@ -21,15 +21,12 @@ namespace aoc.aoc2023.day07
         private static int Part2((string, int)[] hands) =>
             Solve(hands, "AKQT98765432J", t => GetType(t, 0));
 
-        private static int Solve((string hand, int bid)[] hands, string cards, Func<int[], int> getKey) =>
+        private static int Solve((string hand, int bid)[] hands, string cards, Func<int[], int> getType) =>
             hands
                 .Select(t => (hand: t.hand.Select(c => cards.IndexOf(c)).ToArray(), t.bid))
-                .OrderBy(t => GetKey(getKey, t.hand))
+                .OrderBy(t => getType(t.hand) << 20 | t.hand.Aggregate(0, (a, c) => a << 4 | c))
                 .Select((t, i) => t.bid * (hands.Length - i))
                 .Sum();
-
-        private static int GetKey(Func<int[], int> getType, int[] hand) =>
-            getType(hand) << 20 | hand.Aggregate(0, (a, c) => a << 4 | c);
 
         private static int GetType(int[] hand)
         {
