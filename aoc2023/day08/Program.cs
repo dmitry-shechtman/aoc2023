@@ -23,9 +23,7 @@ namespace aoc.aoc2023.day08
         }
 
         private static long Part2(int[] dirs, Dictionary<string, string[]> map) =>
-            map.Keys
-                .Select(s => s[^1] == 'A' ? GetCycle(s, dirs, map) : 1)
-                .Aggregate(Lcm);
+            map.Keys.Lcm(s => s[^1] == 'A' ? GetCycle(s, dirs, map) : 1);
 
         private static long GetCycle(string node, int[] dirs, Dictionary<string, string[]> map)
         {
@@ -35,12 +33,6 @@ namespace aoc.aoc2023.day08
                 (node, step) = (map[node][dirs[step]], (step + 1) % dirs.Length);
             return steps.Count - step;
         }
-
-        private static long Lcm(long a, long b) =>
-            a / Gcd(a, b) * b;
-
-        private static long Gcd(long a, long b) =>
-            b == 0 ? a : Gcd(b, a % b);
 
         private static void Parse(string path, out int[] dirs, out Dictionary<string, string[]> map)
         {
