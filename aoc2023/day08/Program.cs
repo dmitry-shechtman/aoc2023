@@ -27,13 +27,13 @@ namespace aoc.aoc2023.day08
                 .Select(s => s[^1] == 'A' ? GetCycle(s, dirs, map) : 1)
                 .Aggregate(Lcm);
 
-        private static long GetCycle(string start, int[] dirs, Dictionary<string, string[]> map)
+        private static long GetCycle(string node, int[] dirs, Dictionary<string, string[]> map)
         {
             HashSet<(string, int)> steps = new();
-            var curr = (node: start, step: 0);
-            while (steps.Add(curr))
-                curr = (map[curr.node][dirs[curr.step]], (curr.step + 1) % dirs.Length);
-            return steps.Count - curr.step;
+            int step = 0;
+            while (steps.Add((node, step)))
+                (node, step) = (map[node][dirs[step]], (step + 1) % dirs.Length);
+            return steps.Count - step;
         }
 
         private static long Lcm(long a, long b) =>
