@@ -22,20 +22,14 @@ namespace aoc.aoc2023.day08
             return step;
         }
 
-        private static long Part2(int[] dirs, Dictionary<string, string[]> map)
-        {
-            var keys = map.Keys.ToArray();
-            var values = map.Values
-                .Select(t => t.Select(t => Array.IndexOf(keys, t)).ToArray())
-                .ToArray();
-            return keys
-                .Select((s, i) => s[^1] == 'A' ? GetCycle(i, dirs, values) : 1)
+        private static long Part2(int[] dirs, Dictionary<string, string[]> map) =>
+            map.Keys
+                .Select(s => s[^1] == 'A' ? GetCycle(s, dirs, map) : 1)
                 .Aggregate(Lcm);
-        }
 
-        private static long GetCycle(int start, int[] dirs, int[][] map)
+        private static long GetCycle(string start, int[] dirs, Dictionary<string, string[]> map)
         {
-            HashSet<(int, int)> steps = new();
+            HashSet<(string, int)> steps = new();
             var curr = (node: start, step: 0);
             while (steps.Add(curr))
                 curr = (map[curr.node][dirs[curr.step]], (curr.step + 1) % dirs.Length);
