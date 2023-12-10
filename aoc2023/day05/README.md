@@ -212,7 +212,7 @@ A *map* transforms a *value* by passing it to all entries with matching source r
     {
         //...
         public IEnumerable<long> Transform(long value) =>
-            Entries.Where(m => m.Source.Match(value)).Select(m => m.Transform(value));
+            Entries.Where(m => m.Source.IsMatch(value)).Select(m => m.Transform(value));
         //...
     }
 ```
@@ -223,7 +223,7 @@ A *range* matches a *value* by checking whether it, well, falls within the range
     struct LongRange
     {
         //...
-        public bool Match(long value) =>
+        public bool IsMatch(long value) =>
             value >= Min && value <= Max;
         //...
     }
@@ -284,7 +284,7 @@ A *map* transforms a *range* by passing it to all entries with matching source r
     {
         //...
         public IEnumerable<LongRange> Transform(LongRange range) =>
-            Entries.Where(m => m.Source.Match(range)).Select(m => m.Transform(range));
+            Entries.Where(m => m.Source.IsMatch(range)).Select(m => m.Transform(range));
     }
 ```
 
@@ -294,7 +294,7 @@ A *range* matches another *range* by checking whether there is an overlap betwee
     struct LongRange
     {
         //...
-        public bool Match(LongRange other) =>
+        public bool IsMatch(LongRange other) =>
             other.Min <= Max && other.Max >= Min;
         //...
     }

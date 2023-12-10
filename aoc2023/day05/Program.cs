@@ -31,10 +31,10 @@ namespace aoc.aoc2023.day05
                 new(s.Trim().Split('\n')[1..].Select(Entry.Parse).ToArray());
 
             public IEnumerable<long> Transform(long value) =>
-                Entries.Where(m => m.Source.Match(value)).Select(m => m.Transform(value));
+                Entries.Where(m => m.Source.IsMatch(value)).Select(m => m.Transform(value));
 
             public IEnumerable<LongRange> Transform(LongRange range) =>
-                Entries.Where(m => m.Source.Match(range)).Select(m => m.Transform(range));
+                Entries.Where(m => m.Source.IsMatch(range)).Select(m => m.Transform(range));
         }
 
         static void Main(string[] args)
