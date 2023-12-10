@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace day09
+namespace aoc.aoc2023.day09
 {
     class Program
     {
