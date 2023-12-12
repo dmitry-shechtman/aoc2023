@@ -14,35 +14,31 @@ namespace aoc.aoc2023.day10
             var s = File.ReadAllText(args[0]);
             Vector p = FindChar(s, 'S');
             var vv = Headings.Where(v => GetNext(s, p + v, v) != Zero);
-            Dictionary<Vector, int> dd = new();
-            Console.WriteLine(Part1(s, p, vv, dd));
-            Console.WriteLine(Part2(s, p, vv, dd));
+            HashSet<Vector> pp = new();
+            Console.WriteLine(Part1(s, p, vv, pp));
+            Console.WriteLine(Part2(s, p, vv, pp));
         }
 
-        private static int Part1(string s, Vector p, IEnumerable<Vector> vv, Dictionary<Vector, int> dd) =>
-            vv.Max(v => MaxDistance(s, p, v, dd));
+        private static int Part1(string s, Vector p, IEnumerable<Vector> vv, HashSet<Vector> pp) =>
+            MaxDistance(s, p, vv.First(), pp);
 
-        private static int Part2(string s, Vector p, IEnumerable<Vector> vv, Dictionary<Vector, int> dd)
-        {
-            HashSet<Vector> pp = new(dd.Keys) { p };
-            return vv.Zip(new[] { Matrix.RotateRight, Matrix.RotateLeft })
+        private static int Part2(string s, Vector p, IEnumerable<Vector> vv, HashSet<Vector> pp) =>
+            vv.Zip(new[] { Matrix.RotateRight, Matrix.RotateLeft })
                 .Sum(t => CountFill(s, p, t.First, t.Second, pp));
-        }
 
-        private static int MaxDistance(string s, Vector p, Vector v, Dictionary<Vector, int> dd)
+        private static int MaxDistance(string s, Vector p, Vector v, HashSet<Vector> pp)
         {
-            int d = 0, max = 0;
-            for (Vector q = p + v; q != p; q += v = GetNext(s, q, v))
-                if (!dd.TryAdd(q, ++d))
-                    max = Math.Max(max, dd[q] = Math.Min(dd[q], d));
-            return max;
+            int d = 0;
+            for (p += v; v != Zero; p += v = GetNext(s, p, v), ++d)
+                pp.Add(p);
+            return d / 2;
         }
 
         private static int CountFill(string s, Vector p, Vector v, Matrix m, HashSet<Vector> pp)
         {
             int count = 0;
-            for (Vector q = p + v; q != p; q += v = GetNext(s, q, v))
-                count += FloodFill(q + v * m, pp);
+            for (p += v; v != Zero; p += v = GetNext(s, p, v))
+                count += FloodFill(p + v * m, pp);
             return count;
         }
 
