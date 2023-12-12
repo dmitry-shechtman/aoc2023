@@ -23,11 +23,11 @@ namespace aoc.aoc2023.day12
         private static long Solve((string, int[])[] tt, int n) =>
             tt.Sum(t => Count(t, n));
 
-        private static long Count((string s, int[] lengths) t, int n)
+        private static long Count((string s, int[] lens) t, int n)
         {
             string s = string.Join('?', Enumerable.Repeat(t.s, n));
-            int[] lengths = Enumerable.Repeat(t.lengths, n).SelectMany(v => v).ToArray();
-            return Count(s, lengths, new());
+            int[] lens = Enumerable.Repeat(t.lens, n).SelectMany(v => v).ToArray();
+            return Count(s, lens, new());
         }
 
         private static long Count(string s, int[] lens, Dictionary<int, long> counts, int key = 0)
