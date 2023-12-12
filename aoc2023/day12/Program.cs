@@ -43,7 +43,7 @@ namespace aoc.aoc2023.day12
             {
                 char c = s[first++], d = s[last++];
                 if (k == len && d != '#')
-                    count += Count(s[last..], lens[1..], counts, key + last * 16 + 1);
+                    count += Count(s[last..], lens[1..], counts, key + last * 32 + 1);
                 if (c == '#')
                     return counts[key] = count;
                 k += (d == '.' ? 0 : 1) - (c == '.' ? 0 : 1);
