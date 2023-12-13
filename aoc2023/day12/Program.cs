@@ -38,7 +38,7 @@ namespace aoc.aoc2023.day12
                 return counts[key] = s.Any(c => c == '#') ? 0 : 1;
             int len = lens[0];
             int max = s.Length - lens.Length - Math.Max(len, lens.Sum() - 1);
-            int k = s[..lens[0]].Count(c => c != '.');
+            int k = s[..len].Count(c => c != '.');
             for (int first = 0, last = len; first <= max; )
             {
                 char c = s[first++], d = s[last++];
