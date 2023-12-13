@@ -25,7 +25,7 @@ namespace aoc.aoc2023.day13
             Sum(pp, n, p => p.y, (p, v) => (p.x, v)) * 100;
 
         private static int Sum(HashSet<Vector> pp, int n, Func<Vector, int> f, Func<Vector, int, Vector> g) =>
-            Enumerable.Range(0, pp.Max(f) + 1).Where(i =>
+            Enumerable.Range(1, pp.Max(f)).Where(i =>
                 Enumerable.Range(0, Math.Min(i, pp.Max(f) + 1 - i)).Sum(j =>
                     pp.Where(p => f(p) == i + j).Count(p => !pp.Contains(g(p, i - j - 1))) +
                     pp.Where(p => f(p) == i - j - 1).Count(p => !pp.Contains(g(p, i + j)))) == n)
