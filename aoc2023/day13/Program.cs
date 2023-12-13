@@ -33,7 +33,7 @@ namespace aoc.aoc2023.day13
 
         private static HashSet<Vector>[] Parse(string path) =>
             File.ReadAllText(path).Split("\n\n")
-                .Select(s => Vector.ParseField(s))
+                .Select(Vector.ParseField)
                 .ToArray();
     }
 }
