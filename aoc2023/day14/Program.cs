@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace aoc.aoc2023.day14
 {
     class Program
     {
-        private const char Empty = '.', Round = 'O', Square = '#', NewLine = '\n';
+        private const byte Empty = 0x2E, Round = 0x4F, Square = 0x23, NewLine = 0x0A;
 
         static void Main(string[] args)
         {
@@ -17,23 +18,23 @@ namespace aoc.aoc2023.day14
 
         private static int Part1(string s)
         {
-            int width1 = s.IndexOf(NewLine) + 1;
-            var r = s.ToCharArray();
+            int width1 = s.IndexOf('\n') + 1;
+            var r = Encoding.ASCII.GetBytes(s);
             TiltNorth(r, width1);
-            return GetLoad(r, width1);
+            return GetLoad(Encoding.ASCII.GetString(r), width1);
         }
 
         private static int Part2(string s)
         {
-            int width1 = s.IndexOf(NewLine) + 1;
+            int width1 = s.IndexOf('\n') + 1;
             List<string> history = new();
             int i;
-            for (char[] r = s.ToCharArray(); (i = history.IndexOf(s)) < 0; s = GetNext(r, width1))
+            for (var r = Encoding.ASCII.GetBytes(s); (i = history.IndexOf(s)) < 0; s = GetNext(r, width1))
                 history.Add(s);
             return GetLoad(history[(1000000000 - i) % (history.Count - i) + i], width1);
         }
 
-        private static int GetLoad(ReadOnlySpan<char> s, int width1)
+        private static int GetLoad(string s, int width1)
         {
             int load = 0;
             for (int i = 0; i < s.Length; i++)
@@ -42,16 +43,16 @@ namespace aoc.aoc2023.day14
             return load;
         }
 
-        private static string GetNext(char[] r, int width1)
+        private static string GetNext(byte[] r, int width1)
         {
             TiltNorth(r, width1);
             TiltWest (r);
             TiltSouth(r, width1);
             TiltEast (r);
-            return new(r);
+            return Encoding.ASCII.GetString(r);
         }
 
-        private static void TiltNorth(char[] r, int width1)
+        private static void TiltNorth(byte[] r, int width1)
         {
             for (int x = 0; x < width1 - 1; ++x)
             {
@@ -71,7 +72,7 @@ namespace aoc.aoc2023.day14
             }
         }
 
-        private static void TiltWest(char[] r)
+        private static void TiltWest(byte[] r)
         {
             for (int i = 0, j = -1; i < r.Length; ++i)
             {
@@ -89,7 +90,7 @@ namespace aoc.aoc2023.day14
             }
         }
 
-        private static void TiltSouth(char[] r, int width1)
+        private static void TiltSouth(byte[] r, int width1)
         {
             for (int x = width1 - 2; x >= 0; --x)
             {
@@ -109,7 +110,7 @@ namespace aoc.aoc2023.day14
             }
         }
 
-        private static void TiltEast(char[] r)
+        private static void TiltEast(byte[] r)
         {
             for (int j = r.Length, i = j - 1; i >= 0; --i)
             {
