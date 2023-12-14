@@ -6,7 +6,7 @@ namespace aoc.aoc2023.day14
 {
     class Program
     {
-        private const char Empty = '.', Round = 'O';
+        private const char Empty = '.', Round = 'O', Square = '#';
 
         static void Main(string[] args)
         {
@@ -45,68 +45,86 @@ namespace aoc.aoc2023.day14
         private static string GetNext(char[] r, int width1)
         {
             TiltNorth(r, width1);
-            TiltWest (r, width1);
+            TiltWest (r);
             TiltSouth(r, width1);
-            TiltEast (r, width1);
+            TiltEast (r);
             return new(r);
         }
 
         private static void TiltNorth(char[] r, int width1)
         {
-            for (int i = 0, j; i < r.Length; i++)
+            for (int x = 0; x < width1 - 1; ++x)
             {
-                if (r[i] == Round)
+                for (int i = x, j = x; i < r.Length; i += width1)
                 {
-                    for (j = i; j >= width1; j -= width1)
-                        if (r[j - width1] != Empty)
+                    switch (r[i])
+                    {
+                        case Round:
+                            r[i] = Empty;
+                            r[j] = Round;
+                            j += width1;
                             break;
-                    r[i] = Empty;
-                    r[j] = Round;
+                        case Square:
+                            j = i + width1;
+                            break;
+                    }
                 }
             }
         }
 
-        private static void TiltWest(char[] r, int width1)
+        private static void TiltWest(char[] r)
         {
-            for (int i = 0, j; i < r.Length; i++)
+            for (int i = 0, j = 0; i < r.Length; ++i)
             {
-                if (r[i] == Round)
+                switch (r[i])
                 {
-                    for (j = i; j % width1 > 0; --j)
-                        if (r[j - 1] != Empty)
-                            break;
-                    r[i] = Empty;
-                    r[j] = Round;
+                    case Round:
+                        r[i] = Empty;
+                        r[j++] = Round;
+                        break;
+                    case Square:
+                    case '\n':
+                        j = i + 1;
+                        break;
                 }
             }
         }
 
         private static void TiltSouth(char[] r, int width1)
         {
-            for (int i = r.Length - 1, j; i >= 0; i--)
+            for (int x = width1 - 2; x >= 0; --x)
             {
-                if (r[i] == Round)
+                for (int i = r.Length - width1 + x, j = i; i >= 0; i -= width1)
                 {
-                    for (j = i; j < r.Length - width1; j += width1)
-                        if (r[j + width1] != Empty)
+                    switch (r[i])
+                    {
+                        case Round:
+                            r[i] = Empty;
+                            r[j] = Round;
+                            j -= width1;
                             break;
-                    r[i] = Empty;
-                    r[j] = Round;
+                        case Square:
+                            j = i - width1;
+                            break;
+                    }
                 }
             }
         }
 
-        private static void TiltEast(char[] r, int width1)
+        private static void TiltEast(char[] r)
         {
-            for (int i = r.Length - 1, j; i >= 0; i--)
+            for (int i = r.Length - 1, j = i; i >= 0; --i)
             {
-                if (r[i] == Round)
+                switch (r[i])
                 {
-                    for (j = i; j % width1 + 1 < width1; ++j)
-                        if (r[j + 1] != Empty)
-                            break;
-                    r[i] = Empty;
-                    r[j] = Round;
+                    case Round:
+                        r[i] = Empty;
+                        r[j--] = Round;
+                        break;
+                    case Square:
+                    case '\n':
+                        j = i - 1;
+                        break;
                 }
             }
         }
