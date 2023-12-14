@@ -28,8 +28,14 @@ namespace aoc.aoc2023.day14
             int width1 = s.IndexOf('\n') + 1;
             List<string> history = new();
             int i;
-            for (; (i = history.IndexOf(s)) < 0; s = GetNext(s, width1))
+            for (char[] r = s.ToCharArray(); (i = history.IndexOf(s)) < 0; s = new(r))
+            {
                 history.Add(s);
+                TiltNorth(r, width1);
+                TiltWest (r, width1);
+                TiltSouth(r, width1);
+                TiltEast (r, width1);
+            }
             return GetLoad(history[(1000000000 - i) % (history.Count - i) + i], width1);
         }
 
@@ -40,16 +46,6 @@ namespace aoc.aoc2023.day14
                 if (s[i] == Round)
                     load += width1 - 1 - i / width1;
             return load;
-        }
-
-        private static string GetNext(string s, int width1)
-        {
-            var r = s.ToCharArray();
-            TiltNorth(r, width1);
-            TiltWest (r, width1);
-            TiltSouth(r, width1);
-            TiltEast (r, width1);
-            return new(r);
         }
 
         private static void TiltNorth(char[] r, int width1)
