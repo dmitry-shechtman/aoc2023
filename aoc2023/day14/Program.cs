@@ -55,17 +55,16 @@ namespace aoc.aoc2023.day14
         {
             for (int x = 0; x < width1 - 1; ++x)
             {
-                for (int i = x, j = x; i < r.Length; i += width1)
+                for (int i = x, j = i - width1; i < r.Length; i += width1)
                 {
                     switch (r[i])
                     {
                         case Round:
                             r[i] = Empty;
-                            r[j] = Round;
-                            j += width1;
+                            r[j += width1] = Round;
                             break;
                         case Square:
-                            j = i + width1;
+                            j = i;
                             break;
                     }
                 }
@@ -74,17 +73,17 @@ namespace aoc.aoc2023.day14
 
         private static void TiltWest(char[] r)
         {
-            for (int i = 0, j = 0; i < r.Length; ++i)
+            for (int i = 0, j = -1; i < r.Length; ++i)
             {
                 switch (r[i])
                 {
                     case Round:
                         r[i] = Empty;
-                        r[j++] = Round;
+                        r[++j] = Round;
                         break;
                     case Square:
                     case NewLine:
-                        j = i + 1;
+                        j = i;
                         break;
                 }
             }
@@ -94,17 +93,16 @@ namespace aoc.aoc2023.day14
         {
             for (int x = width1 - 2; x >= 0; --x)
             {
-                for (int i = r.Length - width1 + x, j = i; i >= 0; i -= width1)
+                for (int j = r.Length + x, i = j - width1; i >= 0; i -= width1)
                 {
                     switch (r[i])
                     {
                         case Round:
                             r[i] = Empty;
-                            r[j] = Round;
-                            j -= width1;
+                            r[j -= width1] = Round;
                             break;
                         case Square:
-                            j = i - width1;
+                            j = i;
                             break;
                     }
                 }
@@ -113,17 +111,17 @@ namespace aoc.aoc2023.day14
 
         private static void TiltEast(char[] r)
         {
-            for (int i = r.Length - 1, j = i; i >= 0; --i)
+            for (int j = r.Length, i = j - 1; i >= 0; --i)
             {
                 switch (r[i])
                 {
                     case Round:
                         r[i] = Empty;
-                        r[j--] = Round;
+                        r[--j] = Round;
                         break;
                     case Square:
                     case NewLine:
-                        j = i - 1;
+                        j = i;
                         break;
                 }
             }
