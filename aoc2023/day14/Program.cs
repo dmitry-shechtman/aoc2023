@@ -6,142 +6,110 @@ namespace aoc.aoc2023.day14
 {
     class Program
     {
+        private const char Empty = '.', Round = 'O';
+
         static void Main(string[] args)
         {
-            var rocks = Parse(args[0]);
-            Console.WriteLine(Part1(rocks));
-            Console.WriteLine(Part2(rocks));
+            string s = File.ReadAllText(args[0]);
+            Console.WriteLine(Part1(s));
+            Console.WriteLine(Part2(s));
         }
 
-        private static int Part1(int[,] rocks) =>
-            GetLoad(TiltNorth((int[,])rocks.Clone()));
-
-        private static int Part2(int[,] rocks)
+        private static int Part1(string s)
         {
-            List<int[,]> history = new();
-            int i;
-            for (; (i = history.FindIndex(r => ArrayEquals(rocks, r))) < 0; rocks = GetNext(rocks))
-                history.Add(rocks);
-            return GetLoad(history[(1000000000 - i) % (history.Count - i) + i]);
+            int width1 = s.IndexOf('\n') + 1;
+            var r = s.ToCharArray();
+            TiltNorth(r, width1);
+            return GetLoad(r, width1);
         }
 
-        private static int GetLoad(int[,] rocks)
+        private static int Part2(string s)
+        {
+            int width1 = s.IndexOf('\n') + 1;
+            List<string> history = new();
+            int i;
+            for (; (i = history.IndexOf(s)) < 0; s = GetNext(s, width1))
+                history.Add(s);
+            return GetLoad(history[(1000000000 - i) % (history.Count - i) + i], width1);
+        }
+
+        private static int GetLoad(ReadOnlySpan<char> s, int width1)
         {
             int load = 0;
-            int width = rocks.GetLength(0), height = rocks.GetLength(1);
-            for (int x = 0; x < width; ++x)
-                for (int y = 0; y < height; ++y)
-                    if (rocks[x, y] == 2)
-                        load += height - y;
+            for (int i = 0; i < s.Length; i++)
+                if (s[i] == Round)
+                    load += width1 - 1 - i / width1;
             return load;
         }
 
-        private static bool ArrayEquals(int[,] left, int[,] right)
+        private static string GetNext(string s, int width1)
         {
-            int width = left.GetLength(0), height = left.GetLength(1);
-            for (int x = 0; x < width; ++x)
-                for (int y = 0; y < height; ++y)
-                    if (left[x, y] != right[x, y])
-                        return false;
-            return true;
+            var r = s.ToCharArray();
+            TiltNorth(r, width1);
+            TiltWest (r, width1);
+            TiltSouth(r, width1);
+            TiltEast (r, width1);
+            return new(r);
         }
 
-        private static int[,] GetNext(int[,] rocks) =>
-            TiltEast(TiltSouth(TiltWest(TiltNorth((int[,])rocks.Clone()))));
-
-        private static int[,] TiltNorth(int[,] rocks)
+        private static void TiltNorth(char[] r, int width1)
         {
-            int width = rocks.GetLength(0), height = rocks.GetLength(1);
-            for (int x = 0; x < width; ++x)
-                for (int y = 0; y < height; ++y)
-                    if (rocks[x, y] == 2)
-                    {
-                        rocks[x, y] = 0;
-                        rocks[x, SlideNorth(rocks, x, y)] = 2;
-                    }
-            return rocks;
+            for (int i = 0, j; i < r.Length; i++)
+            {
+                if (r[i] == Round)
+                {
+                    for (j = i; j >= width1; j -= width1)
+                        if (r[j - width1] != Empty)
+                            break;
+                    r[i] = Empty;
+                    r[j] = Round;
+                }
+            }
         }
 
-        private static int[,] TiltWest(int[,] rocks)
+        private static void TiltWest(char[] r, int width1)
         {
-            int width = rocks.GetLength(0), height = rocks.GetLength(1);
-            for (int x = 0; x < width; ++x)
-                for (int y = 0; y < height; ++y)
-                    if (rocks[x, y] == 2)
-                    {
-                        rocks[x, y] = 0;
-                        rocks[SlideWest(rocks, x, y), y] = 2;
-                    }
-            return rocks;
+            for (int i = 0, j; i < r.Length; i++)
+            {
+                if (r[i] == Round)
+                {
+                    for (j = i; j % width1 > 0; --j)
+                        if (r[j - 1] != Empty)
+                            break;
+                    r[i] = Empty;
+                    r[j] = Round;
+                }
+            }
         }
 
-        private static int[,] TiltSouth(int[,] rocks)
+        private static void TiltSouth(char[] r, int width1)
         {
-            int width = rocks.GetLength(0), height = rocks.GetLength(1);
-            for (int x = 0; x < width; ++x)
-                for (int y = height - 1; y >= 0; --y)
-                    if (rocks[x, y] == 2)
-                    {
-                        rocks[x, y] = 0;
-                        rocks[x, SlideSouth(rocks, x, y, height)] = 2;
-                    }
-            return rocks;
+            for (int i = r.Length - 1, j; i >= 0; i--)
+            {
+                if (r[i] == Round)
+                {
+                    for (j = i; j < r.Length - width1; j += width1)
+                        if (r[j + width1] != Empty)
+                            break;
+                    r[i] = Empty;
+                    r[j] = Round;
+                }
+            }
         }
 
-        private static int[,] TiltEast(int[,] rocks)
+        private static void TiltEast(char[] r, int width1)
         {
-            int width = rocks.GetLength(0), height = rocks.GetLength(1);
-            for (int x = width - 1; x >= 0; --x)
-                for (int y = 0; y < height; ++y)
-                    if (rocks[x, y] == 2)
-                    {
-                        rocks[x, y] = 0;
-                        rocks[SlideEast(rocks, x, y, width), y] = 2;
-                    }
-            return rocks;
-        }
-
-        private static int SlideNorth(int[,] rocks, int x, int y)
-        {
-            for (int i = y - 1; i >= 0; --i)
-                if (rocks[x, i] != 0)
-                    return i + 1;
-            return 0;
-        }
-
-        private static int SlideWest(int[,] rocks, int x, int y)
-        {
-            for (int i = x - 1; i >= 0; --i)
-                if (rocks[i, y] != 0)
-                    return i + 1;
-            return 0;
-        }
-
-        private static int SlideSouth(int[,] rocks, int x, int y, int height)
-        {
-            for (int i = y + 1; i < height; ++i)
-                if (rocks[x, i] != 0)
-                    return i - 1;
-            return height - 1;
-        }
-
-        private static int SlideEast(int[,] rocks, int x, int y, int width)
-        {
-            for (int i = x + 1; i < width; ++i)
-                if (rocks[i, y] != 0)
-                    return i - 1;
-            return width - 1;
-        }
-
-        private static int[,] Parse(string path)
-        {
-            var ss = File.ReadAllLines(path);
-            int width = ss[0].Length, height = ss.Length;
-            var rocks = new int[width, height];
-            for (int y = 0; y < height; ++y)
-                for (int x = 0; x < width; ++x)
-                    rocks[x, y] = ".#O".IndexOf(ss[y][x]);
-            return rocks;
+            for (int i = r.Length - 1, j; i >= 0; i--)
+            {
+                if (r[i] == Round)
+                {
+                    for (j = i; j % width1 + 1 < width1; ++j)
+                        if (r[j + 1] != Empty)
+                            break;
+                    r[i] = Empty;
+                    r[j] = Round;
+                }
+            }
         }
     }
 }
