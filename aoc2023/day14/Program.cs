@@ -6,7 +6,7 @@ namespace aoc.aoc2023.day14
 {
     class Program
     {
-        private const char Empty = '.', Round = 'O', Square = '#';
+        private const char Empty = '.', Round = 'O', Square = '#', NewLine = '\n';
 
         static void Main(string[] args)
         {
@@ -17,7 +17,7 @@ namespace aoc.aoc2023.day14
 
         private static int Part1(string s)
         {
-            int width1 = s.IndexOf('\n') + 1;
+            int width1 = s.IndexOf(NewLine) + 1;
             var r = s.ToCharArray();
             TiltNorth(r, width1);
             return GetLoad(r, width1);
@@ -25,7 +25,7 @@ namespace aoc.aoc2023.day14
 
         private static int Part2(string s)
         {
-            int width1 = s.IndexOf('\n') + 1;
+            int width1 = s.IndexOf(NewLine) + 1;
             List<string> history = new();
             int i;
             for (char[] r = s.ToCharArray(); (i = history.IndexOf(s)) < 0; s = GetNext(r, width1))
@@ -83,7 +83,7 @@ namespace aoc.aoc2023.day14
                         r[j++] = Round;
                         break;
                     case Square:
-                    case '\n':
+                    case NewLine:
                         j = i + 1;
                         break;
                 }
@@ -122,7 +122,7 @@ namespace aoc.aoc2023.day14
                         r[j--] = Round;
                         break;
                     case Square:
-                    case '\n':
+                    case NewLine:
                         j = i - 1;
                         break;
                 }
