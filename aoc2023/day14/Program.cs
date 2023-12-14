@@ -14,7 +14,7 @@ namespace aoc.aoc2023.day14
         }
 
         private static int Part1(int[,] rocks) =>
-            GetLoad(TiltNorth(rocks));
+            GetLoad(TiltNorth((int[,])rocks.Clone()));
 
         private static int Part2(int[,] rocks)
         {
@@ -47,58 +47,58 @@ namespace aoc.aoc2023.day14
         }
 
         private static int[,] GetNext(int[,] rocks) =>
-            TiltEast(TiltSouth(TiltWest(TiltNorth(rocks))));
+            TiltEast(TiltSouth(TiltWest(TiltNorth((int[,])rocks.Clone()))));
 
         private static int[,] TiltNorth(int[,] rocks)
         {
             int width = rocks.GetLength(0), height = rocks.GetLength(1);
-            var rocks2 = new int[width, height];
             for (int x = 0; x < width; ++x)
                 for (int y = 0; y < height; ++y)
                     if (rocks[x, y] == 2)
-                        rocks2[x, SlideNorth(rocks2, x, y)] = 2;
-                    else
-                        rocks2[x, y] = rocks[x, y];
-            return rocks2;
+                    {
+                        rocks[x, y] = 0;
+                        rocks[x, SlideNorth(rocks, x, y)] = 2;
+                    }
+            return rocks;
         }
 
         private static int[,] TiltWest(int[,] rocks)
         {
             int width = rocks.GetLength(0), height = rocks.GetLength(1);
-            var rocks2 = new int[width, height];
             for (int x = 0; x < width; ++x)
                 for (int y = 0; y < height; ++y)
                     if (rocks[x, y] == 2)
-                        rocks2[SlideWest(rocks2, x, y), y] = 2;
-                    else
-                        rocks2[x, y] = rocks[x, y];
-            return rocks2;
+                    {
+                        rocks[x, y] = 0;
+                        rocks[SlideWest(rocks, x, y), y] = 2;
+                    }
+            return rocks;
         }
 
         private static int[,] TiltSouth(int[,] rocks)
         {
             int width = rocks.GetLength(0), height = rocks.GetLength(1);
-            var rocks2 = new int[width, height];
             for (int x = 0; x < width; ++x)
                 for (int y = height - 1; y >= 0; --y)
                     if (rocks[x, y] == 2)
-                        rocks2[x, SlideSouth(rocks2, x, y, height)] = 2;
-                    else
-                        rocks2[x, y] = rocks[x, y];
-            return rocks2;
+                    {
+                        rocks[x, y] = 0;
+                        rocks[x, SlideSouth(rocks, x, y, height)] = 2;
+                    }
+            return rocks;
         }
 
         private static int[,] TiltEast(int[,] rocks)
         {
             int width = rocks.GetLength(0), height = rocks.GetLength(1);
-            var rocks2 = new int[width, height];
             for (int x = width - 1; x >= 0; --x)
                 for (int y = 0; y < height; ++y)
                     if (rocks[x, y] == 2)
-                        rocks2[SlideEast(rocks2, x, y, width), y] = 2;
-                    else
-                        rocks2[x, y] = rocks[x, y];
-            return rocks2;
+                    {
+                        rocks[x, y] = 0;
+                        rocks[SlideEast(rocks, x, y, width), y] = 2;
+                    }
+            return rocks;
         }
 
         private static int SlideNorth(int[,] rocks, int x, int y)
