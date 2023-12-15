@@ -9,7 +9,7 @@ namespace aoc.aoc2023.day15
 {
     class Program
     {
-        private static readonly Regex Regex = new(@"^(([a-z]+)(\-|=([1-9])))$");
+        private static readonly Regex Regex = new(@"^(([a-z]+)(-|=([1-9])))$");
 
         static void Main(string[] args)
         {
