@@ -28,12 +28,9 @@ namespace aoc.aoc2023.day15
             var boxes = new List<Step>[256];
             for (int i = 0; i < 256; i++)
                 boxes[i] = new();
-            for (int i = 0; i < steps.Count; i++)
-                Update(boxes, steps[i], bytes);
             int total = 0;
-            for (int i = 0; i < 256; i++)
-                for (int j = 0; j < boxes[i].Count; j++)
-                    total += (i + 1) * (j + 1) * (bytes[boxes[i][j].LEnd + 1] - '0');
+            for (int i = 0; i < steps.Count; i++)
+                total += Update(boxes, steps[i], bytes);
             return total;
         }
 
@@ -45,14 +42,25 @@ namespace aoc.aoc2023.day15
             return hash;
         }
 
-        private static void Update(List<Step>[] boxes, Step step, byte[] bytes)
+        private static int Update(List<Step>[] boxes, Step step, byte[] bytes)
         {
-            var box = boxes[GetHash(bytes, step.Offset, step.LEnd)];
-            int index = FindIndex(box, step, bytes);
-            if (index >= 0)
-                box.RemoveAt(index);
+            var boxIndex = GetHash(bytes, step.Offset, step.LEnd);
+            var box = boxes[boxIndex];
+            var lensIndex = FindIndex(box, step, bytes);
+            var delta = 0;
+            if (lensIndex >= 0)
+            {
+                delta -= GetDelta(box, boxIndex, lensIndex, bytes);
+                box.RemoveAt(lensIndex);
+            }
             if (bytes[step.LEnd] == '=')
-                box.Insert(index >= 0 ? index : box.Count, step);
+            {
+                if (lensIndex < 0)
+                    lensIndex = box.Count;
+                box.Insert(lensIndex, step);
+                delta += GetDelta(box, boxIndex, lensIndex, bytes);
+            }
+            return delta;
         }
 
         private static int FindIndex(List<Step> box, Step step, byte[] bytes)
@@ -71,6 +79,14 @@ namespace aoc.aoc2023.day15
                 if (bytes[left.Offset + j] != bytes[right.Offset + j])
                     return false;
             return true;
+        }
+
+        private static int GetDelta(List<Step> box, int boxIndex, int lensIndex, byte[] bytes)
+        {
+            int sum = lensIndex * (bytes[box[lensIndex].LEnd + 1] - '0');
+            for (int i = lensIndex; i < box.Count; i++)
+                sum += bytes[box[i].LEnd + 1] - '0';
+            return (boxIndex + 1) * sum;
         }
 
         private static List<Step> Parse(string path, out byte[] bytes)
