@@ -8,9 +8,9 @@ namespace aoc.aoc2023.day15
     {
         struct Step
         {
-            public int Offset;
-            public int LEnd;
-            public int SEnd;
+            public readonly int Offset;
+            public readonly int LEnd;
+            public readonly int SEnd;
 
             public Step(int offset, int lEnd, int sEnd)
             {
