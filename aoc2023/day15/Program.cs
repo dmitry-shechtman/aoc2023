@@ -6,7 +6,19 @@ namespace aoc.aoc2023.day15
 {
     class Program
     {
-        record Step(int Offset, int LEnd, int SEnd);
+        struct Step
+        {
+            public int Offset;
+            public int LEnd;
+            public int SEnd;
+
+            public Step(int offset, int lEnd, int sEnd)
+            {
+                Offset = offset;
+                LEnd = lEnd;
+                SEnd = sEnd;
+            }
+        }
 
         static void Main(string[] args)
         {
@@ -27,7 +39,7 @@ namespace aoc.aoc2023.day15
         {
             var boxes = new List<Step>[256];
             for (int i = 0; i < 256; i++)
-                boxes[i] = new();
+                boxes[i] = new List<Step>();
             int total = 0;
             for (int i = 0; i < steps.Count; i++)
                 total += Update(boxes, steps[i], bytes);
@@ -92,13 +104,13 @@ namespace aoc.aoc2023.day15
         private static List<Step> Parse(string path, out byte[] bytes)
         {
             bytes = File.ReadAllBytes(path);
-            List<Step> steps = new();
+            List<Step> steps = new List<Step>();
             for (int i = 0, j = 0; j < bytes.Length && bytes[j] != '\n'; ++j)
             {
                 if (bytes[j] == '-' || bytes[j] == '=')
                 {
                     int k = j + (bytes[j] == '-' ? 1 : 2);
-                    steps.Add(new(i, j, k));
+                    steps.Add(new Step(i, j, k));
                     j = k;
                     i = j + 1;
                 }
