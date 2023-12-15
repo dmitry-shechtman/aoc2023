@@ -27,9 +27,10 @@ namespace aoc.aoc2023.day15
                 .Select(_ => new List<(string, int length)>())
                 .ToArray();
             tt.ForEach(t => Update(boxes, t.label, t.length));
-            return boxes.Select((b, i) => (b, i))
-                .Sum(t => t.b.Select((l, i) => (l.length, i))
-                    .Sum(u => (t.i + 1) * (u.i + 1) * u.length));
+            return boxes.Select((b, i) =>
+                b.Select((l, j) =>
+                    (i + 1) * (j + 1) * l.length).Sum())
+                .Sum();
         }
 
         private static int GetHash(string s) =>
