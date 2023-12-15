@@ -24,7 +24,7 @@ namespace aoc.aoc2023.day15
         private static int Part2(List<(string step, string label, int length)> tt)
         {
             var boxes = Enumerable.Range(0, 256)
-                .Select(_ => new List<(string, int length)>())
+                .Select(_ => new LinkedList<(string, int length)>())
                 .ToArray();
             tt.ForEach(t => Update(boxes, t.label, t.length));
             return boxes.Select((b, i) =>
@@ -37,14 +37,17 @@ namespace aoc.aoc2023.day15
             Encoding.ASCII.GetBytes(s)
                 .Aggregate(0, (a, b) => (a + b) * 17 % 256);
 
-        private static void Update(List<(string label, int)>[] boxes, string label, int length)
+        private static void Update(LinkedList<(string label, int)>[] boxes, string label, int length)
         {
             var box = boxes[GetHash(label)];
-            var index = box.FindIndex(t => t.label == label);
-            if (index >= 0)
-                box.RemoveAt(index);
-            if (length > 0)
-                box.Insert(index >= 0 ? index : box.Count, (label, length));
+            var node = box.Find(t => t.label == label);
+            if (node is not null)
+                if (length == 0)
+                    box.Remove(node);
+                else
+                    node.Value = (label, length);
+            else if (length > 0)
+                box.AddLast((label, length));
         }
 
         private static List<(string, string, int)> Parse(string path) =>
