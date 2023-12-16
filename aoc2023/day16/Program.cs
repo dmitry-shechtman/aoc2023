@@ -64,8 +64,8 @@ namespace aoc.aoc2023.day16
             r = VectorRange.FromField(s);
             var dd = new uint[r.Count << 2];
             Vector p = Vector.Zero;
-            for (int i = 0, j = 0, h; i < s.Length; i++, p = h >= 0 ? p + (1, 0) : (0, p.y + 1))
-                if ((h = "|-./?\\".IndexOf(s[i])) >= 0)
+            for (int i = 0, j = 0, h; i < s.Length; i++, p = h < 6 ? p + (1, 0) : (0, p.y + 1))
+                if ((h = "|-./?\\\n".IndexOf(s[i])) < 6)
                     for (int k = 0; k < 4; ++k)
                         dd[j++] = (k & 1) != (h ^ 1)
                             ? GetDirection(p, k ^ (h > 1 ? h - 2 : 0), r)
