@@ -54,7 +54,7 @@ namespace aoc.aoc2023.day16
             uint q;
             if (v != (v |= 1 << (p & 3)))
                 for (a[i] = v, q = dd[p]; q > 0; q >>= 16)
-                    n += Energize((ushort)q, dd, a);
+                    n += Energize((ushort)q - 1, dd, a);
             return n;
         }
 
@@ -68,15 +68,20 @@ namespace aoc.aoc2023.day16
                 if ((h = "|-./?\\\n".IndexOf(s[i])) < 6)
                     for (int k = 0; k < 4; ++k)
                         dd[j++] = (k & 1) != (h ^ 1)
-                            ? GetDirection(p, k ^ (h > 1 ? h - 2 : 0), r)
-                            : GetDirection(p, h, r) << 16 | GetDirection(p, h + 2, r);
+                            ? GetDirection(p, r, k ^ (h > 1 ? h - 2 : 0))
+                            : GetDirection(p, r, h + 2, h);
             return dd;
         }
 
-        private static uint GetDirection(Vector p, int i, VectorRange r)
+        private static uint GetDirection(Vector p, VectorRange r, params int[] hh)
         {
-            Vector q = p + Vector.Headings[i];
-            return r.IsMatch(q) ? (uint)((q.y * r.Width + q.x) << 2 | i) : 0;
+            uint v = 0;
+            foreach (var h in hh)
+            {
+                Vector q = p + Vector.Headings[h];
+                v = r.IsMatch(q) ? v << 16 | (uint)((q.y * r.Width + q.x) << 2 | h) + 1 : v;
+            }
+            return v;
         }
     }
 }
