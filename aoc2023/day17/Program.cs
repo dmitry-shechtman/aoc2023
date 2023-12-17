@@ -35,15 +35,20 @@ namespace aoc.aoc2023.day17
             Vector4DRange r = new((r2d.Max, MaxHeading, maxCount));
             int[] losses = new int[r.Count];
             Vector4D[] init = { ((0, 0), East, 0), ((0, 0), South, 0) };
+            init.AsParallel().ForAll(v => Walk(input, losses, r2d, r, predicate, v));
+            return new Vector4DRange((r2d.Max, MinHeading, minCount), r.Max)
+                .Select(p => p.GetValue(losses, r))
+                .Where(v => v > 0)
+                .Min();
+        }
+
+        private static void Walk(int[] input, int[] losses, VectorRange r2d, Vector4DRange r, Func<int, int, int, bool> predicate, params Vector4D[] init)
+        {
             Queue<Vector4D> candidates = new(init);
             while (candidates.TryDequeue(out var curr))
                 for (int i = 0; i <= MaxHeading; i++)
                     if (predicate(curr.z, curr.w, i))
                         Process(curr, i, input, candidates, losses, r2d, r);
-            return new Vector4DRange((r2d.Max, MinHeading, minCount), r.Max)
-                .Select(p => p.GetValue(losses, r))
-                .Where(v => v > 0)
-                .Min();
         }
 
         private static void Process(Vector4D curr, int heading2, int[] input, Queue<Vector4D> candidates, int[] losses, VectorRange r2d, Vector4DRange r)
