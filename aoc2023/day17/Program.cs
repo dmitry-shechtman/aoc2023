@@ -46,24 +46,28 @@ namespace aoc.aoc2023.day17
         {
             Queue<Vector4D> candidates = new(init);
             while (candidates.TryDequeue(out var curr))
+            {
+                int loss = curr.GetValue(losses, r);
                 for (int i = 0; i <= MaxHeading; i++)
                     if (predicate(curr.z, curr.w, i))
-                        Process(curr, i, input, candidates, losses, r2d, r);
+                        Process(curr, loss, i, input, candidates, losses, r2d, r);
+            }
         }
 
-        private static void Process(Vector4D curr, int heading2, int[] input, Queue<Vector4D> candidates, int[] losses, VectorRange r2d, Vector4DRange r)
+        private static void Process(Vector4D curr, int loss, int heading2, int[] input, Queue<Vector4D> candidates, int[] losses, VectorRange r2d, Vector4DRange r)
         {
             var (curr2d, heading, count) = curr;
             Vector next2d = curr2d + Vector.Headings[heading2];
             int count2 = heading2 == heading ? count + 1 : 1;
             Vector4D next = (next2d, heading2, count2);
-            if (next.TryGetValue(losses, r, out int loss2))
+            if (r.IsMatch(next))
             {
-                int loss = curr.GetValue(losses, r) +
-                    next2d.GetValue(input, r2d);
-                if (loss2 == 0 || loss2 > loss)
+                int loss1 = loss + next2d.GetValue(input, r2d);
+                int index2 = next.GetIndex(r);
+                int loss2 = losses[index2];
+                if (loss2 == 0 || loss2 > loss1)
                 {
-                    next.SetValue(losses, loss, r);
+                    losses[index2] = loss1;
                     candidates.Enqueue(next);
                 }
             }
