@@ -32,66 +32,76 @@ namespace aoc.aoc2023.day17
 
         private static int Solve(int[] input, VectorRange r2d, int minCount, int maxCount, Func<int, int, int, bool> predicate)
         {
-            Vector4D max = (r2d.Max, MaxHeading, maxCount);
-            Vector4D size = max + (1, 1, 1, 1);
-            int[] losses = new int[size.Count()];
-            List<Vector4D> init = new();
-            foreach (Vector4D curr in new[]{ ((0, 0), East, 0), ((0, 0), South, 0) })
+            (int x, int y, int heading, int count)
+                max = (r2d.Max.x, r2d.Max.y, MaxHeading, maxCount),
+                size = (max.x + 1, max.y + 1, max.heading + 1, max.count + 1);
+            int[] losses = new int[size.x * size.y * size.heading * size.count];
+            List<(int, int, int, int)> init = new();
+            foreach ((int x, int y, int heading, int count) in new[]{ (0, 0, East, 0), (0, 0, South, 0) })
             {
-                var (curr2d, heading, count) = curr;
                 for (int i = 0; i < 4; i++)
                 {
-                    if (predicate(curr.z, curr.w, i))
+                    if (predicate(heading, count, i))
                     {
-                        Vector next2d = curr2d + Vector.Headings[i];
-                        int count2 = i == heading ? count + 1 : 1;
-                        Vector4D next = (next2d, i, count2);
-                        if (next.x >= 0 && next.y >= 0 && next < size)
+                        var (x2, y2) = Vector.Headings[i];
+                        if (x2 >= 0 && y2 >= 0 && x2 < size.x && y2 < size.y)
                         {
-                            int loss1 = next2d.GetValue(input, r2d);
-                            next.SetValue(losses, loss1, size);
-                            init.Insert(0, next);
+                            int count2 = i == heading ? count + 1 : 1;
+                            if (count2 < size.count)
+                            {
+                                var next = (x2, y2, i, count2);
+                                losses[GetIndex(next, size)] = input[x2 + size.x * y2];
+                                init.Insert(0, next);
+                            }
                         }
                     }
                 }
             }
             init.AsParallel().ForAll(v => Walk(input, losses, size, predicate, v));
             return new Vector4DRange((r2d.Max, MinHeading, minCount), max)
-                .Select(p => p.GetValue(losses, size))
+                .Select(p => GetIndex(p, size))
+                .Select(i => losses[i])
                 .Where(v => v > 0)
                 .Min();
         }
 
-        private static void Walk(int[] input, int[] losses, Vector4D size, Func<int, int, int, bool> predicate, params Vector4D[] init)
+        private static void Walk(int[] input, int[] losses, (int, int, int, int) size, Func<int, int, int, bool> predicate, params (int, int, int, int)[] init)
         {
-            Queue<Vector4D> candidates = new(init);
+            Queue<(int, int, int heading, int count)> candidates = new(init);
             while (candidates.TryDequeue(out var curr))
             {
-                int loss = curr.GetValue(losses, size);
-                for (int i = 0; i <= MaxHeading; i++)
-                    if (predicate(curr.z, curr.w, i))
+                int index = GetIndex(curr, size);
+                int loss = losses[index];
+                for (int i = 0; i < 4; i++)
+                    if (predicate(curr.heading, curr.count, i))
                         Process(curr, loss, i, input, candidates, losses, size);
             }
         }
 
-        private static void Process(Vector4D curr, int loss, int heading2, int[] input, Queue<Vector4D> candidates, int[] losses, Vector4D size)
+        private static void Process((int, int, int, int) curr, int loss, int heading2, int[] input, Queue<(int, int, int, int)> candidates, int[] losses, (int x, int y, int heading, int count) size)
         {
-            var (curr2d, heading, count) = curr;
-            Vector next2d = curr2d + Vector.Headings[heading2];
-            int count2 = heading2 == heading ? count + 1 : 1;
-            Vector4D next = (next2d, heading2, count2);
-            if (next.x >= 0 && next.y >= 0 && next < size)
+            var (x, y, heading, count) = curr;
+            var (x2, y2) = (x, y) + Vector.Headings[heading2];
+            if (x2 >= 0 && y2 >= 0 && x2 < size.x && y2 < size.y)
             {
-                int loss1 = loss + next2d.GetValue(input, (Vector)size);
-                int index2 = next.GetIndex(size);
-                int loss2 = losses[index2];
-                if (loss2 == 0 || loss2 > loss1)
+                int count2 = heading2 == heading ? count + 1 : 1;
+                if (count2 < size.count)
                 {
-                    losses[index2] = loss1;
-                    candidates.Enqueue(next);
+                    var next = (x2, y2, heading2, count2);
+                    int loss1 = loss + input[x2 + size.x * y2];
+                    int index2 = GetIndex(next, size);
+                    int loss2 = losses[index2];
+                    if (loss2 == 0 || loss2 > loss1)
+                    {
+                        losses[index2] = loss1;
+                        candidates.Enqueue(next);
+                    }
                 }
             }
         }
+
+        private static int GetIndex((int x, int y, int z, int w) p, (int x, int y, int z, int) size) =>
+            p.x + size.x * (p.y + size.y * (p.z + size.z * p.w));
 
         private static int[] Parse(string path, out VectorRange r)
         {
