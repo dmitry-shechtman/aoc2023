@@ -19,18 +19,18 @@ namespace aoc.aoc2023.day17
         }
 
         private static int Part1(int[] input, VectorRange r) =>
-            Solve(input, r, MinCount1, MaxCount1, Predicate1);
+            Solve(input, r, MinCount1, MaxCount1, Match1);
 
         private static int Part2(int[] input, VectorRange r) =>
-            Solve(input, r, MinCount2, MaxCount2, Predicate2);
+            Solve(input, r, MinCount2, MaxCount2, Match2);
 
-        private static bool Predicate1(int heading, int _, int i) =>
+        private static bool Match1(int heading, int _, int i) =>
             i != (heading ^ Reverse);
 
-        private static bool Predicate2(int heading, int count, int i) =>
+        private static bool Match2(int heading, int count, int i) =>
             i == heading || count >= MinCount2;
 
-        private static int Solve(int[] input, VectorRange r2d, int minCount, int maxCount, Func<int, int, int, bool> predicate)
+        private static int Solve(int[] input, VectorRange r2d, int minCount, int maxCount, Func<int, int, int, bool> match)
         {
             (int x, int y, int heading, int count)
                 max = (r2d.Max.x, r2d.Max.y, MaxHeading, maxCount),
@@ -41,7 +41,7 @@ namespace aoc.aoc2023.day17
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    if (predicate(heading, count, i))
+                    if (match(heading, count, i))
                     {
                         var (x2, y2) = Vector.Headings[i];
                         if (x2 >= 0 && y2 >= 0 && x2 < size.x && y2 < size.y)
@@ -57,7 +57,7 @@ namespace aoc.aoc2023.day17
                     }
                 }
             }
-            init.AsParallel().ForAll(v => Walk(input, losses, size, predicate, v));
+            init.AsParallel().ForAll(v => Walk(input, losses, size, match, v));
             return new Vector4DRange((r2d.Max, MinHeading, minCount), max)
                 .Select(p => GetIndex(p, size))
                 .Select(i => losses[i])
@@ -65,7 +65,7 @@ namespace aoc.aoc2023.day17
                 .Min();
         }
 
-        private static void Walk(int[] input, int[] losses, (int, int, int, int) size, Func<int, int, int, bool> predicate, params (int, int, int, int)[] init)
+        private static void Walk(int[] input, int[] losses, (int, int, int, int) size, Func<int, int, int, bool> match, params (int, int, int, int)[] init)
         {
             Queue<(int, int, int heading, int count)> candidates = new(init);
             while (candidates.TryDequeue(out var curr))
@@ -73,7 +73,7 @@ namespace aoc.aoc2023.day17
                 int index = GetIndex(curr, size);
                 int loss = losses[index];
                 for (int i = 0; i < 4; i++)
-                    if (predicate(curr.heading, curr.count, i))
+                    if (match(curr.heading, curr.count, i))
                         Process(curr, loss, i, input, candidates, losses, size);
             }
         }
