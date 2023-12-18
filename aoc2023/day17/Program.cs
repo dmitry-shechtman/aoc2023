@@ -19,18 +19,18 @@ namespace aoc.aoc2023.day17
         }
 
         private static int Part1(int[] input, VectorRange r) =>
-            Solve(input, r, MinCount1, MaxCount1, Predicate1);
+            Solve(input, r, MinCount1, MaxCount1, Match1);
 
         private static int Part2(int[] input, VectorRange r) =>
-            Solve(input, r, MinCount2, MaxCount2, Predicate2);
+            Solve(input, r, MinCount2, MaxCount2, Match2);
 
-        private static bool Predicate1(int heading, int _, int i) =>
+        private static bool Match1(int heading, int _, int i) =>
             i != (heading ^ Reverse);
 
-        private static bool Predicate2(int heading, int count, int i) =>
+        private static bool Match2(int heading, int count, int i) =>
             i == heading || count >= MinCount2;
 
-        private static int Solve(int[] input, VectorRange r2d, int minCount, int maxCount, Func<int, int, int, bool> predicate)
+        private static int Solve(int[] input, VectorRange r2d, int minCount, int maxCount, Func<int, int, int, bool> match)
         {
             Vector4D max = (r2d.Max, MaxHeading, maxCount);
             Vector4D size = max + (1, 1, 1, 1);
@@ -41,7 +41,7 @@ namespace aoc.aoc2023.day17
                 var (curr2d, heading, count) = curr;
                 for (int i = 0; i < 4; i++)
                 {
-                    if (predicate(curr.z, curr.w, i))
+                    if (match(curr.z, curr.w, i))
                     {
                         Vector next2d = curr2d + Vector.Headings[i];
                         int count2 = i == heading ? count + 1 : 1;
@@ -55,21 +55,21 @@ namespace aoc.aoc2023.day17
                     }
                 }
             }
-            init.AsParallel().ForAll(v => Walk(input, losses, size, predicate, v));
+            init.AsParallel().ForAll(v => Walk(input, losses, size, match, v));
             return new Vector4DRange((r2d.Max, MinHeading, minCount), max)
                 .Select(p => p.GetValue(losses, size))
                 .Where(v => v > 0)
                 .Min();
         }
 
-        private static void Walk(int[] input, int[] losses, Vector4D size, Func<int, int, int, bool> predicate, params Vector4D[] init)
+        private static void Walk(int[] input, int[] losses, Vector4D size, Func<int, int, int, bool> match, params Vector4D[] init)
         {
             Queue<Vector4D> candidates = new(init);
             while (candidates.TryDequeue(out var curr))
             {
                 int loss = curr.GetValue(losses, size);
                 for (int i = 0; i <= MaxHeading; i++)
-                    if (predicate(curr.z, curr.w, i))
+                    if (match(curr.z, curr.w, i))
                         Process(curr, loss, i, input, candidates, losses, size);
             }
         }
