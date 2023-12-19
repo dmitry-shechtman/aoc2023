@@ -81,11 +81,11 @@ namespace aoc.aoc2023.day17
         private static void Process((int, int, int, int) curr, int loss, int heading2, int[] input, Queue<(int, int, int, int)> candidates, int[] losses, (int x, int y, int heading, int count) size)
         {
             var (x, y, heading, count) = curr;
-            var (x2, y2) = (x, y) + Vector.Headings[heading2];
-            if (x2 >= 0 && y2 >= 0 && x2 < size.x && y2 < size.y)
+            int count2 = heading2 == heading ? count + 1 : 1;
+            if (count2 < size.count)
             {
-                int count2 = heading2 == heading ? count + 1 : 1;
-                if (count2 < size.count)
+                var (x2, y2) = (x, y) + Vector.Headings[heading2];
+                if (x2 >= 0 && y2 >= 0 && x2 < size.x && y2 < size.y)
                 {
                     var next = (x2, y2, heading2, count2);
                     int loss1 = loss + input[x2 + size.x * y2];
