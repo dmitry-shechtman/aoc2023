@@ -61,7 +61,7 @@ namespace aoc.aoc2023.day17
             Vector next2d = curr2d + Vector.Headings[heading2];
             int count2 = heading2 == heading ? count + 1 : 1;
             Vector4D next = (next2d, heading2, count2);
-            if (next.x >= 0 && next.y >= 0 && next < size)
+            if (size.Contains(next))
             {
                 int loss1 = loss + next2d.GetValue(input, (Vector)size);
                 int index2 = next.GetIndex(size);
