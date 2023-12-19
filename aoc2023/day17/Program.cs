@@ -35,26 +35,7 @@ namespace aoc.aoc2023.day17
             Vector4D max = (r2d.Max, MaxHeading, maxCount);
             Vector4D size = max + (1, 1, 1, 1);
             int[] losses = new int[size.Count()];
-            List<Vector4D> init = new();
-            foreach (Vector4D curr in new[]{ ((0, 0), East, 0), ((0, 0), South, 0) })
-            {
-                var (curr2d, heading, count) = curr;
-                for (int i = 0; i < 4; i++)
-                {
-                    if (match(curr.z, curr.w, i))
-                    {
-                        Vector next2d = curr2d + Vector.Headings[i];
-                        int count2 = i == heading ? count + 1 : 1;
-                        Vector4D next = (next2d, i, count2);
-                        if (next.x >= 0 && next.y >= 0 && next < size)
-                        {
-                            int loss1 = next2d.GetValue(input, r2d);
-                            next.SetValue(losses, loss1, size);
-                            init.Insert(0, next);
-                        }
-                    }
-                }
-            }
+            Vector4D[] init = { ((0, 0), East, 0), ((0, 0), South, 0) };
             init.AsParallel().ForAll(v => Walk(input, losses, size, match, v));
             return new Vector4DRange((r2d.Max, MinHeading, minCount), max)
                 .Select(p => p.GetValue(losses, size))
