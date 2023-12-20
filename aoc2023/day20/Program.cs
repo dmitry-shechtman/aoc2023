@@ -69,16 +69,15 @@ namespace aoc.aoc2023.day20
 
         private static void Step((long, long)[] modules, int start, LongState state, int step)
         {
-            Queue<(bool, int)> queue = new();
-            queue.Enqueue((false, start));
+            Queue<(bool, int, long)> queue = new();
+            queue.Enqueue((false, start, 1L << start));
             while (queue.TryDequeue(out var tuple))
             {
-                var (pulse, index) = tuple;
+                var (pulse, index, mask) = tuple;
                 if (!pulse)
                     ++state.Low;
                 else
                     ++state.High;
-                var mask = 1L << index;
                 var (destMask, srcMask) = modules[index];
                 if ((mask & state.FlipMask) != 0)
                 {
@@ -98,9 +97,9 @@ namespace aoc.aoc2023.day20
                     state.Lcm = MathEx.Lcm(state.Lcm, step);
                     state.LcmMask &= ~mask;
                 }
-                for (mask = 1L, index = 0; index < modules.Length; mask <<= 1, ++index)
+                for (mask = 1L, index = 0; mask <= destMask; mask <<= 1, ++index)
                     if ((destMask & mask) != 0)
-                        queue.Enqueue((pulse, index));
+                        queue.Enqueue((pulse, index, mask));
             }
         }
 
