@@ -5,26 +5,26 @@ using System.Linq;
 
 namespace aoc.aoc2023.day20
 {
-    abstract record Module(long Mask, long DestMask)
+    abstract record Module(long DestMask)
     {
-        public abstract bool Transform(long state, bool pulse);
+        public abstract bool Transform(long state, long mask, bool pulse);
     }
 
-    record RelayModule(long Mask, long DestMask) : Module(Mask, DestMask)
+    record RelayModule(long DestMask) : Module(DestMask)
     {
-        public override bool Transform(long state, bool pulse) =>
+        public override bool Transform(long state, long mask, bool pulse) =>
             pulse;
     }
 
-    record FlipFlopModule(long Mask, long DestMask) : Module(Mask, DestMask)
+    record FlipFlopModule(long DestMask) : Module(DestMask)
     {
-        public override bool Transform(long state, bool pulse) =>
-            (state & Mask) == 0;
+        public override bool Transform(long state, long mask, bool pulse) =>
+            (state & mask) == 0;
     }
 
-    record ConjunctionModule(long Mask, long DestMask, long SourceMask) : Module(Mask, DestMask)
+    record ConjunctionModule(long DestMask, long SourceMask) : Module(DestMask)
     {
-        public override bool Transform(long state, bool pulse) =>
+        public override bool Transform(long state, long mask, bool pulse) =>
             (state & SourceMask) != SourceMask;
     }
 
@@ -74,17 +74,16 @@ namespace aoc.aoc2023.day20
 
         private static void Step(Module[] modules, int start, LongState state, int step)
         {
-            Queue<(bool, int)> queue = new();
-            queue.Enqueue((false, start));
+            Queue<(bool, int, long)> queue = new();
+            queue.Enqueue((false, start, 1L << start));
             while (queue.TryDequeue(out var tuple))
             {
-                var (pulse, index) = tuple;
+                var (pulse, index, mask) = tuple;
                 ++state.Counts[pulse ? 1 : 0];
                 var module = modules[index];
-                var mask = module.Mask;
                 if (pulse && (mask & state.FlipMask) != 0)
                     continue;
-                pulse = module.Transform(state.State, pulse);
+                pulse = module.Transform(state.State, mask, pulse);
                 state.State = pulse
                     ? state.State | mask
                     : state.State & ~mask;
@@ -95,7 +94,7 @@ namespace aoc.aoc2023.day20
                 }
                 for (mask = 1L, index = 0; index < modules.Length; mask <<= 1, ++index)
                     if ((module.DestMask & mask) != 0)
-                        queue.Enqueue((pulse, index));
+                        queue.Enqueue((pulse, index, mask));
             }
         }
 
@@ -110,7 +109,7 @@ namespace aoc.aoc2023.day20
                 .Select(GetKey)
                 .ToArray();
             var modules = tuples
-                .Select((t, i) => CreateModule(i, t.key, t.dests, tuples, keys))
+                .Select(t => CreateModule(t.key, t.dests, tuples, keys))
                 .ToArray();
             start = keys.IndexOf(StartKey);
             var flipMask = GetFlipFlopMask(tuples);
@@ -119,14 +118,14 @@ namespace aoc.aoc2023.day20
             return modules;
         }
 
-        private static Module CreateModule(int index, string key, string[] dests, List<(string key, string[] dests)> tuples, string[] keys) =>
-            CreateModule(1L << index, key, GetDestMask(dests, keys), tuples);
+        private static Module CreateModule(string key, string[] dests, List<(string key, string[] dests)> tuples, string[] keys) =>
+            CreateModule(key, GetDestMask(dests, keys), tuples);
 
-        private static Module CreateModule(long mask, string key, long destMask, List<(string key, string[] dests)> tuples) => key[0] switch
+        private static Module CreateModule(string key, long destMask, List<(string key, string[] dests)> tuples) => key[0] switch
         {
-            FlipFlopPrefix    => new FlipFlopModule(mask, destMask),
-            ConjunctionPrefix => new ConjunctionModule(mask, destMask, GetSourceMask(GetKey(key), tuples)),
-            _ => new RelayModule(mask, destMask),
+            FlipFlopPrefix    => new FlipFlopModule(destMask),
+            ConjunctionPrefix => new ConjunctionModule(destMask, GetSourceMask(GetKey(key), tuples)),
+            _ => new RelayModule(destMask),
         };
 
         private static string GetKey((string key, string[] dests) tuple) =>
