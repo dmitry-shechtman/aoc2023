@@ -124,8 +124,7 @@ namespace aoc.aoc2023.day20
         private static long GetSourceMask(string key, List<(string key, string[] dests)> tuples) =>
             tuples.Select()
                 .Where(t => t.Value.dests.Contains(key))
-                .Select(t => 1L << t.Index)
-                .Sum();
+                .Sum(t => 1L << t.Index);
 
         private static List<(string key, string[] dests)> Parse(string path) =>
             File.ReadAllLines(path)
