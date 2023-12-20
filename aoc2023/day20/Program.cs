@@ -22,9 +22,8 @@ namespace aoc.aoc2023.day20
             (state & Mask) == 0;
     }
 
-    record ConjunctionModule(long Mask, int[] Dests) : Module(Mask, Dests)
+    record ConjunctionModule(long Mask, long SourceMask, int[] Dests) : Module(Mask, Dests)
     {
-        public long SourceMask { get; set; }
         public override bool Transform(long state, bool pulse) =>
             (state & SourceMask) != SourceMask;
     }
@@ -89,11 +88,8 @@ namespace aoc.aoc2023.day20
             var indices = tuples.Select()
                 .ToDictionary(t => GetKey(t.Value), t => t.Index);
             var modules = tuples
-                .Select((t, i) => CreateModule(i, t.key, t.dests, indices))
+                .Select((t, i) => CreateModule(i, t.key, t.dests, tuples, indices))
                 .ToArray();
-            for (int i = 0; i < modules.Length; i++)
-                if (modules[i] is ConjunctionModule conjunction)
-                    conjunction.SourceMask = GetSourceMask(i, modules);
             start = indices[StartKey];
             return modules;
         }
@@ -103,26 +99,29 @@ namespace aoc.aoc2023.day20
                 .Select(m => m is ConjunctionModule ? 0L : 1L)
                 .ToArray();
 
-        private static Module CreateModule(int index, string key, string[] dests, Dictionary<string, int> indices) =>
-            CreateModule(1L << index, key, GetDestinations(dests, indices));
+        private static Module CreateModule(int index, string key, string[] dests, List<(string key, string[] dests)> tuples, Dictionary<string, int> indices) =>
+            CreateModule(1L << index, key, GetDestinations(dests, indices), tuples);
 
-        private static Module CreateModule(long mask, string key, int[] dests) => key[0] switch
+        private static Module CreateModule(long mask, string key, int[] dests, List<(string key, string[] dests)> tuples) => key[0] switch
         {
             '%' => new FlipFlopModule(mask, dests),
-            '&' => new ConjunctionModule(mask, dests),
+            '&' => new ConjunctionModule(mask, GetSourceMask(GetKey(key), tuples), dests),
             _ => new RelayModule(mask, dests),
         };
 
         private static string GetKey((string key, string[] dests) tuple) =>
-            tuple.key.TrimStart('%', '&');
+            GetKey(tuple.key);
+
+        private static string GetKey(string key) =>
+            key.TrimStart('%', '&');
 
         private static int[] GetDestinations(string[] dests, Dictionary<string, int> indices) =>
             dests.Select(d => indices[d]).ToArray();
 
-        private static long GetSourceMask(int index, Module[] modules) =>
-            modules
-                .Where(t => t.Dests.Contains(index))
-                .Select(t => t.Mask)
+        private static long GetSourceMask(string key, List<(string key, string[] dests)> tuples) =>
+            tuples.Select()
+                .Where(t => t.Value.dests.Contains(key))
+                .Select(t => 1L << t.Index)
                 .Sum();
 
         private static List<(string key, string[] dests)> Parse(string path) =>
