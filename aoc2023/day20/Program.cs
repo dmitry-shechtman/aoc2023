@@ -24,9 +24,9 @@ namespace aoc.aoc2023.day20
 
     record ConjunctionModule(int[] Dests) : Module(Dests)
     {
-        public long[] SourceMasks { get; set; }
+        public long SourceMask { get; set; }
         public override bool Transform(long state, bool pulse) =>
-            !SourceMasks.All(m => (state & m) != 0);
+            (state & SourceMask) != SourceMask;
     }
 
     class Program
@@ -93,7 +93,7 @@ namespace aoc.aoc2023.day20
                 .ToArray();
             for (int i = 0; i < modules.Length; i++)
                 if (modules[i] is ConjunctionModule conjunction)
-                    conjunction.SourceMasks = GetSourceMasks(i, modules);
+                    conjunction.SourceMask = GetSourceMask(i, modules);
             start = indices[StartKey];
             return modules;
         }
@@ -119,11 +119,11 @@ namespace aoc.aoc2023.day20
         private static int[] GetDestinations(string[] dests, Dictionary<string, int> indices) =>
             dests.Select(d => indices[d]).ToArray();
 
-        private static long[] GetSourceMasks(int index, Module[] modules) =>
+        private static long GetSourceMask(int index, Module[] modules) =>
             modules.Select()
                 .Where(t => t.Value.Dests.Contains(index))
                 .Select(t => 1L << t.Index)
-                .ToArray();
+                .Sum();
 
         private static List<(string key, string[] dests)> Parse(string path) =>
             File.ReadAllLines(path)
