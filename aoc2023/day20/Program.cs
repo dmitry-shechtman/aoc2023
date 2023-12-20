@@ -38,19 +38,28 @@ namespace aoc.aoc2023.day20
         {
             var (modules, indices) = GetModules(args[0]);
             var start = indices[StartKey];
-            Console.WriteLine(Part1(modules, start));
+            var state = new BitArray(modules.Length);
+            var lengths = CreateLengths(modules);
+            var counts = new int[2];
+            Console.WriteLine(Part1(modules, start, state, counts, lengths));
+            Console.WriteLine(Part2(modules, start, state, counts, lengths));
         }
 
-        private static int Part1(Module[] modules, int start)
+        private static int Part1(Module[] modules, int start, BitArray state, int[] counts, long[] lengths)
         {
-            var state = new BitArray(modules.Length);
-            var counts = new int[2];
             for (int i = 1; i <= 1000; i++)
-                Step(modules, state, counts, start);
+                Step(modules, start, state, counts, lengths, i);
             return counts.Product();
         }
 
-        private static void Step(Module[] modules, BitArray state, int[] counts, int start)
+        private static long Part2(Module[] modules, int start, BitArray state, int[] counts, long[] lengths)
+        {
+            for (int i = 1001; !lengths.All(v => v > 0); i++)
+                Step(modules, start, state, counts, lengths, i);
+            return lengths.Lcm();
+        }
+
+        private static void Step(Module[] modules, int start, BitArray state, int[] counts, long[] lengths, int step)
         {
             Queue<(bool, int)> queue = new();
             queue.Enqueue((false, start));
@@ -62,6 +71,8 @@ namespace aoc.aoc2023.day20
                 if (module is FlipFlopModule && pulse)
                     continue;
                 state[curr] = pulse = module.Transform(state, pulse);
+                if (pulse && lengths[curr] == 0)
+                    lengths[curr] = step;
                 foreach (var next in module.Dests)
                     queue.Enqueue((pulse, next));
             }
@@ -84,6 +95,11 @@ namespace aoc.aoc2023.day20
                     conjunction.Sources = GetSources(i, modules);
             return (modules, indices);
         }
+
+        private static long[] CreateLengths(Module[] modules) =>
+            modules
+                .Select(m => m is ConjunctionModule ? 0L : 1L)
+                .ToArray();
 
         private static Module CreateModule(int index, string key, string[] dests, Dictionary<string, int> indices) =>
             CreateModule(index, key, GetDestinations(dests, indices));
