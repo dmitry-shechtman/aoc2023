@@ -30,7 +30,9 @@ namespace aoc.aoc2023.day20
 
     class Program
     {
-        private const string StartKey = "broadcaster";
+        private const string StartKey          = "broadcaster";
+        private const char   FlipFlopPrefix    = '%';
+        private const char   ConjunctionPrefix = '&';
 
         static void Main(string[] args)
         {
@@ -105,8 +107,8 @@ namespace aoc.aoc2023.day20
 
         private static Module CreateModule(long mask, string key, long destMask, List<(string key, string[] dests)> tuples) => key[0] switch
         {
-            '%' => new FlipFlopModule(mask, destMask),
-            '&' => new ConjunctionModule(mask, destMask, GetSourceMask(GetKey(key), tuples)),
+            FlipFlopPrefix    => new FlipFlopModule(mask, destMask),
+            ConjunctionPrefix => new ConjunctionModule(mask, destMask, GetSourceMask(GetKey(key), tuples)),
             _ => new RelayModule(mask, destMask),
         };
 
@@ -114,7 +116,7 @@ namespace aoc.aoc2023.day20
             GetKey(tuple.key);
 
         private static string GetKey(string key) =>
-            key.TrimStart('%', '&');
+            key.TrimStart(FlipFlopPrefix, ConjunctionPrefix);
 
         private static long GetDestMask(string[] dests, string[] keys) =>
             dests.Select(keys.IndexOf).Sum(index => 1L << index);
