@@ -6,24 +6,24 @@ using System.Linq;
 
 namespace aoc.aoc2023.day20
 {
-    abstract record Module(int Index, int[] Dests)
+    abstract record Module(int[] Dests)
     {
         public abstract bool Transform(BitArray state, bool pulse);
     }
 
-    record RelayModule(int Index, int[] Dests) : Module(Index, Dests)
+    record RelayModule(int[] Dests) : Module(Dests)
     {
         public override bool Transform(BitArray state, bool pulse) =>
             pulse;
     }
 
-    record FlipFlopModule(int Index, int[] Dests) : Module(Index, Dests)
+    record FlipFlopModule(int Index, int[] Dests) : Module(Dests)
     {
         public override bool Transform(BitArray state, bool pulse) =>
             !state[Index];
     }
 
-    record ConjunctionModule(int Index, int[] Dests) : Module(Index, Dests)
+    record ConjunctionModule(int[] Dests) : Module(Dests)
     {
         public int[] Sources { get; set; }
         public override bool Transform(BitArray state, bool pulse) =>
@@ -107,8 +107,8 @@ namespace aoc.aoc2023.day20
         private static Module CreateModule(int index, string key, int[] dests) => key[0] switch
         {
             '%' => new FlipFlopModule(index, dests),
-            '&' => new ConjunctionModule(index, dests),
-            _ => new RelayModule(index, dests),
+            '&' => new ConjunctionModule(dests),
+            _ => new RelayModule(dests),
         };
 
         private static string GetKey((string key, string[] dests) tuple) =>
