@@ -5,24 +5,24 @@ using System.Linq;
 
 namespace aoc.aoc2023.day20
 {
-    abstract record Module(int[] Dests)
+    abstract record Module(long Mask, int[] Dests)
     {
         public abstract bool Transform(long state, bool pulse);
     }
 
-    record RelayModule(int[] Dests) : Module(Dests)
+    record RelayModule(long Mask, int[] Dests) : Module(Mask, Dests)
     {
         public override bool Transform(long state, bool pulse) =>
             pulse;
     }
 
-    record FlipFlopModule(long Mask, int[] Dests) : Module(Dests)
+    record FlipFlopModule(long Mask, int[] Dests) : Module(Mask, Dests)
     {
         public override bool Transform(long state, bool pulse) =>
             (state & Mask) == 0;
     }
 
-    record ConjunctionModule(int[] Dests) : Module(Dests)
+    record ConjunctionModule(long Mask, int[] Dests) : Module(Mask, Dests)
     {
         public long SourceMask { get; set; }
         public override bool Transform(long state, bool pulse) =>
@@ -70,8 +70,8 @@ namespace aoc.aoc2023.day20
                     continue;
                 pulse = module.Transform(state, pulse);
                 state = pulse
-                    ? state | 1L << curr
-                    : state & ~(1L << curr);
+                    ? state | module.Mask
+                    : state & ~module.Mask;
                 if (pulse && lengths[curr] == 0)
                     lengths[curr] = step;
                 foreach (var next in module.Dests)
@@ -104,13 +104,13 @@ namespace aoc.aoc2023.day20
                 .ToArray();
 
         private static Module CreateModule(int index, string key, string[] dests, Dictionary<string, int> indices) =>
-            CreateModule(index, key, GetDestinations(dests, indices));
+            CreateModule(1L << index, key, GetDestinations(dests, indices));
 
-        private static Module CreateModule(int index, string key, int[] dests) => key[0] switch
+        private static Module CreateModule(long mask, string key, int[] dests) => key[0] switch
         {
-            '%' => new FlipFlopModule(1L << index, dests),
-            '&' => new ConjunctionModule(dests),
-            _ => new RelayModule(dests),
+            '%' => new FlipFlopModule(mask, dests),
+            '&' => new ConjunctionModule(mask, dests),
+            _ => new RelayModule(mask, dests),
         };
 
         private static string GetKey((string key, string[] dests) tuple) =>
@@ -120,9 +120,9 @@ namespace aoc.aoc2023.day20
             dests.Select(d => indices[d]).ToArray();
 
         private static long GetSourceMask(int index, Module[] modules) =>
-            modules.Select()
-                .Where(t => t.Value.Dests.Contains(index))
-                .Select(t => 1L << t.Index)
+            modules
+                .Where(t => t.Dests.Contains(index))
+                .Select(t => t.Mask)
                 .Sum();
 
         private static List<(string key, string[] dests)> Parse(string path) =>
