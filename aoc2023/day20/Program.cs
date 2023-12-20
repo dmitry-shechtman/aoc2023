@@ -91,7 +91,7 @@ namespace aoc.aoc2023.day20
             var modules = tuples
                 .Select((t, i) => CreateModule(i, t.key, t.dests, tuples, keys))
                 .ToArray();
-            start = tuples.FindIndex(t => t.key == StartKey);
+            start = keys.IndexOf(StartKey);
             return modules;
         }
 
