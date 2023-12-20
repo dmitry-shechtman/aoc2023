@@ -76,7 +76,9 @@ namespace aoc.aoc2023.day20
                 .ForEach(d => tuples.Add((d, Array.Empty<string>())));
             var indices = tuples.Select()
                 .ToDictionary(t => GetKey(t.Value), t => t.Index);
-            var modules = tuples.Select((t, i) => CreateModule(i, t.key, t.dests, indices)).ToArray();
+            var modules = tuples
+                .Select((t, i) => CreateModule(i, t.key, t.dests, indices))
+                .ToArray();
             for (int i = 0; i < modules.Length; i++)
                 if (modules[i] is ConjunctionModule conjunction)
                     conjunction.Sources = GetSources(i, modules);
