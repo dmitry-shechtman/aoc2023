@@ -36,11 +36,10 @@ namespace aoc.aoc2023.day20
 
         static void Main(string[] args)
         {
-            var (modules, indices) = GetModules(args[0]);
-            var start = indices[StartKey];
+            var modules = GetModules(args[0], out int start);
             var state = new BitArray(modules.Length);
-            var lengths = CreateLengths(modules);
             var counts = new int[2];
+            var lengths = CreateLengths(modules);
             Console.WriteLine(Part1(modules, start, state, counts, lengths));
             Console.WriteLine(Part2(modules, start, state, counts, lengths));
         }
@@ -78,7 +77,7 @@ namespace aoc.aoc2023.day20
             }
         }
 
-        private static (Module[], Dictionary<string, int>) GetModules(string path)
+        private static Module[] GetModules(string path, out int start)
         {
             var tuples = Parse(path);
             tuples.SelectMany(t => t.dests)
@@ -93,7 +92,8 @@ namespace aoc.aoc2023.day20
             for (int i = 0; i < modules.Length; i++)
                 if (modules[i] is ConjunctionModule conjunction)
                     conjunction.Sources = GetSources(i, modules);
-            return (modules, indices);
+            start = indices[StartKey];
+            return modules;
         }
 
         private static long[] CreateLengths(Module[] modules) =>
