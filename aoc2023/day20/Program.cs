@@ -85,12 +85,11 @@ namespace aoc.aoc2023.day20
                 .Except(tuples.Select(GetKey))
                 .ToList()
                 .ForEach(d => tuples.Add((d, Array.Empty<string>())));
-            var indices = tuples.Select()
-                .ToDictionary(t => GetKey(t.Value), t => t.Index);
+            var keys = tuples.Select(GetKey).ToArray();
             var modules = tuples
-                .Select((t, i) => CreateModule(i, t.key, t.dests, tuples, indices))
+                .Select((t, i) => CreateModule(i, t.key, t.dests, tuples, keys))
                 .ToArray();
-            start = indices[StartKey];
+            start = tuples.FindIndex(t => t.key == StartKey);
             return modules;
         }
 
@@ -99,8 +98,8 @@ namespace aoc.aoc2023.day20
                 .Select(m => m is ConjunctionModule ? 0L : 1L)
                 .ToArray();
 
-        private static Module CreateModule(int index, string key, string[] dests, List<(string key, string[] dests)> tuples, Dictionary<string, int> indices) =>
-            CreateModule(1L << index, key, GetDestinations(dests, indices), tuples);
+        private static Module CreateModule(int index, string key, string[] dests, List<(string key, string[] dests)> tuples, string[] keys) =>
+            CreateModule(1L << index, key, GetDestinations(dests, keys), tuples);
 
         private static Module CreateModule(long mask, string key, int[] dests, List<(string key, string[] dests)> tuples) => key[0] switch
         {
@@ -115,8 +114,8 @@ namespace aoc.aoc2023.day20
         private static string GetKey(string key) =>
             key.TrimStart('%', '&');
 
-        private static int[] GetDestinations(string[] dests, Dictionary<string, int> indices) =>
-            dests.Select(d => indices[d]).ToArray();
+        private static int[] GetDestinations(string[] dests, string[] keys) =>
+            dests.Select(keys.IndexOf).ToArray();
 
         private static long GetSourceMask(string key, List<(string key, string[] dests)> tuples) =>
             tuples.Select()
