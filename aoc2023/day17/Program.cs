@@ -34,7 +34,7 @@ namespace aoc.aoc2023.day17
         {
             Vector4D max = (r2d.Max, MaxHeading, maxCount);
             Vector4D size = max + (1, 1, 1, 1);
-            int[] losses = new int[size.Count()];
+            int[] losses = new int[size.Count];
             Vector4D[] init = { ((0, 0), East, 0), ((0, 0), South, 0) };
             init.AsParallel().ForAll(v => Walk(input, losses, size, match, v));
             return new Vector4DRange((r2d.Max, MinHeading, minCount), max)
