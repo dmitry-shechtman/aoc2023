@@ -7,26 +7,24 @@ namespace aoc.aoc2023.day20
 {
     abstract record Module(long DestMask)
     {
-        public abstract bool Transform(long state, long mask, bool pulse);
+        public abstract bool Transform(long state, bool pulse);
     }
 
     record RelayModule(long DestMask) : Module(DestMask)
     {
-        public override bool Transform(long state, long mask, bool pulse) =>
+        public override bool Transform(long state, bool pulse) =>
             pulse;
     }
 
-    record FlipFlopModule(long DestMask) : Module(DestMask)
+    record StateModule(long DestMask, long Mask) : Module(DestMask)
     {
-        public override bool Transform(long state, long mask, bool pulse) =>
-            (state & mask) == 0;
+        public override bool Transform(long state, bool pulse) =>
+            (state & Mask) != Mask;
     }
 
-    record ConjunctionModule(long DestMask, long SourceMask) : Module(DestMask)
-    {
-        public override bool Transform(long state, long mask, bool pulse) =>
-            (state & SourceMask) != SourceMask;
-    }
+    record FlipFlopModule(long DestMask, long Mask) : StateModule(DestMask, Mask);
+
+    record ConjunctionModule(long DestMask, long Mask) : StateModule(DestMask, Mask);
 
     sealed class LongState
     {
@@ -83,7 +81,7 @@ namespace aoc.aoc2023.day20
                 var module = modules[index];
                 if (pulse && (mask & state.FlipMask) != 0)
                     continue;
-                pulse = module.Transform(state.State, mask, pulse);
+                pulse = module.Transform(state.State, pulse);
                 state.State = pulse
                     ? state.State | mask
                     : state.State & ~mask;
@@ -109,7 +107,7 @@ namespace aoc.aoc2023.day20
                 .Select(GetKey)
                 .ToArray();
             var modules = tuples
-                .Select(t => CreateModule(t.key, t.dests, tuples, keys))
+                .Select((t, i) => CreateModule(i, t.key, t.dests, tuples, keys))
                 .ToArray();
             start = keys.IndexOf(StartKey);
             var flipMask = GetFlipFlopMask(tuples);
@@ -118,12 +116,12 @@ namespace aoc.aoc2023.day20
             return modules;
         }
 
-        private static Module CreateModule(string key, string[] dests, List<(string key, string[] dests)> tuples, string[] keys) =>
-            CreateModule(key, GetDestMask(dests, keys), tuples);
+        private static Module CreateModule(int index, string key, string[] dests, List<(string key, string[] dests)> tuples, string[] keys) =>
+            CreateModule(index, key, GetDestMask(dests, keys), tuples);
 
-        private static Module CreateModule(string key, long destMask, List<(string key, string[] dests)> tuples) => key[0] switch
+        private static Module CreateModule(int index, string key, long destMask, List<(string key, string[] dests)> tuples) => key[0] switch
         {
-            FlipFlopPrefix    => new FlipFlopModule(destMask),
+            FlipFlopPrefix    => new FlipFlopModule(destMask, 1L << index),
             ConjunctionPrefix => new ConjunctionModule(destMask, GetSourceMask(GetKey(key), tuples)),
             _ => new RelayModule(destMask),
         };
