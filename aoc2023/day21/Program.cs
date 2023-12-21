@@ -41,10 +41,12 @@ namespace aoc.aoc2023.day21
 
         private static int Count(ref Vector[] pp, ref int i, int steps, bool[] bb, Vector t)
         {
+            int dx = steps / t.x * t.x;
+            int dy = steps / t.y * t.y;
             for (; i < steps; ++i)
-                pp = pp.SelectMany(p => Vector.Headings.Select(v => p + v))
+                pp = pp.SelectMany(Vector.GetNeighborsJVN)
                     .AsParallel()
-                    .Where(p => Vector.GetValue((((p.x % t.x) + t.x) % t.x, ((p.y % t.y) + t.y) % t.y), bb, t))
+                    .Where(p => Vector.GetValue(((p.x + dx) % t.x, (p.y + dy) % t.y), bb, t))
                     .Distinct()
                     .ToArray();
             return pp.Length;
