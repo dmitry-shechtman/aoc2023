@@ -14,12 +14,11 @@ namespace aoc.aoc2023.day20
         public LongState(long flipMask, long conjMask)
         {
             FlipMask = flipMask;
-            LcmMask = ConjMask = conjMask;
+            LcmMask = conjMask;
             Lcm = 1;
         }
 
         public long FlipMask { get; }
-        public long ConjMask { get; }
         public long State { get; set; }
 
         public long Low
@@ -79,16 +78,10 @@ namespace aoc.aoc2023.day20
                 else
                     ++state.High;
                 var (destMask, srcMask) = modules[index];
-                if ((mask & state.FlipMask) != 0)
-                {
-                    if (pulse)
-                        continue;
-                    pulse = (state.State & mask) == 0;
-                }
-                else if ((mask & state.ConjMask) != 0)
-                {
+                if (pulse && (mask & state.FlipMask) != 0)
+                    continue;
+                if (srcMask != 0)
                     pulse = (state.State & srcMask) != srcMask;
-                }
                 state.State = pulse
                     ? state.State | mask
                     : state.State & ~mask;
@@ -112,7 +105,7 @@ namespace aoc.aoc2023.day20
                 .ForEach(d => tuples.Add((d, Array.Empty<string>())));
             var keys = tuples.Select(GetKey).ToArray();
             var modules = tuples
-                .Select(t => CreateModule(t.key, t.dests, tuples, keys))
+                .Select((t, i) => CreateModule(i, t.key, t.dests, tuples, keys))
                 .ToArray();
             start = keys.IndexOf(StartKey);
             var flipMask = GetFlipFlopMask(tuples);
@@ -121,8 +114,8 @@ namespace aoc.aoc2023.day20
             return modules;
         }
 
-        private static (long, long) CreateModule(string key, string[] dests, List<(string key, string[] dests)> tuples, string[] keys) =>
-            (GetDestMask(dests, keys), GetSourceMask(GetKey(key), tuples));
+        private static (long, long) CreateModule(int index, string key, string[] dests, List<(string key, string[] dests)> tuples, string[] keys) =>
+            (GetDestMask(dests, keys), GetSourceMask(index, key, tuples));
 
         private static string GetKey((string key, string[] dests) tuple) =>
             GetKey(tuple.key);
@@ -133,6 +126,13 @@ namespace aoc.aoc2023.day20
         private static long GetDestMask(string[] dests, string[] keys) =>
             dests.Select(keys.IndexOf)
                 .Sum(index => 1L << index);
+
+        private static long GetSourceMask(int index, string key, List<(string key, string[] dests)> tuples) => key[0] switch
+        {
+            ConjunctionPrefix => GetSourceMask(GetKey(key), tuples),
+            FlipFlopPrefix => 1L << index,
+            _ => 0,
+        };
 
         private static long GetSourceMask(string key, List<(string key, string[] dests)> tuples) =>
             tuples.Select()
