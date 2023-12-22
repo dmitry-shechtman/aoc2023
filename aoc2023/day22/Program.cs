@@ -12,15 +12,17 @@ namespace aoc.aoc2023.day22
         {
             var bricks = Parse(args[0]);
             Drop(bricks);
-            Console.WriteLine(Part1(bricks));
-            Console.WriteLine(Part2(bricks));
+            var graph = CreateGraph(bricks);
+            Console.WriteLine(Part1(graph));
+            Console.WriteLine(Part2(graph));
         }
 
-        private static int Part1(Brick[] bricks) =>
-            bricks.Count(b => bricks.All((_, i) => CountSupports(b, bricks, i) != 1));
+        private static int Part1(Graph graph) =>
+            graph.Count(i => graph.All(j => CountSupports(graph, i, j) != 1));
 
-        private static int Part2(Brick[] bricks) =>
-            bricks.Sum((b, i) => CountAllSupports(b, bricks.ToArray(), i));
+        private static int Part2(Graph graph) =>
+            Enumerable.Range(0, graph.VertexCount)
+                .Sum(i => CountSupports(new(graph), i));
 
         private static void Drop(Brick[] bricks)
         {
@@ -28,21 +30,21 @@ namespace aoc.aoc2023.day22
                 bricks[i] -= (0, 0, GetHeight(bricks[i], bricks));
         }
 
+        private static Graph CreateGraph(Brick[] bricks) =>
+            new((i, j) => Supports(bricks[i], bricks[j]), bricks.Length);
+
         private static int GetHeight(Brick brick, Brick[] bricks) =>
             bricks.Where(b => Below(b, brick))
                 .TryMin(b => brick.Min.z - b.Max.z, brick.Min.z) - 1;
 
-        private static int CountAllSupports(Brick brick, Brick[] bricks, int i)
-        {
-            bricks[i] = default;
-            return Enumerable.Range(i, bricks.Length - i)
-                .Where(j => CountSupports(brick, bricks, j) == 0)
-                .Sum(j => 1 + CountAllSupports(bricks[j], bricks, j));
-        }
+        private static int CountSupports(Graph graph, int i) =>
+            graph.Outgoing[i]
+                .Where(j => graph.Remove(i, j) && graph.Incoming[j].Count == 0)
+                .Sum(j => 1 + CountSupports(graph, j));
 
-        private static int CountSupports(Brick brick, Brick[] bricks, int i) =>
-            Supports(brick, bricks[i])
-                ? bricks[..i].Count(b => Supports(b, bricks[i]))
+        private static int CountSupports(Graph graph, int i, int j) =>
+            graph.Outgoing[i].Contains(j)
+                ? graph.Incoming[j].Count
                 : -1;
 
         private static bool Supports(Brick brick, Brick brick2) =>
