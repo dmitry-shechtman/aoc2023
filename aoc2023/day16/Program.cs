@@ -18,7 +18,7 @@ namespace aoc.aoc2023.day16
             Energize(Vector.Zero, 1, s, new int[r.Count], r);
 
         private static int Part2(string s, VectorRange r) =>
-            r.Except(r - 1)
+            r.Border()
                 .Max(p => Enumerable.Range(0, 4)
                     .Max(h => Energize(p, h, s, new int[r.Count], r)));
 
