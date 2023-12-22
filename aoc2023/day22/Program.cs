@@ -21,8 +21,7 @@ namespace aoc.aoc2023.day22
             graph.Count(i => graph.All(j => CountSupports(graph, i, j) != 1));
 
         private static int Part2(Graph graph) =>
-            Enumerable.Range(0, graph.VertexCount)
-                .Sum(i => CountSupports(new(graph), i));
+            graph.Sum(i => CountSupports(new(graph), i));
 
         private static void Drop(Brick[] bricks)
         {
