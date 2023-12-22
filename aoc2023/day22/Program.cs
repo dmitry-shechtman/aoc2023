@@ -17,10 +17,10 @@ namespace aoc.aoc2023.day22
         }
 
         private static int Part1(Brick[] bricks) =>
-            bricks.Count(b => bricks.All((b2, i) => CountSupports(b, bricks, i) != 1));
+            bricks.Count(b => bricks.All((_, i) => CountSupports(b, bricks, i) != 1));
 
         private static int Part2(Brick[] bricks) =>
-            bricks.Sum((b, i) => CountAllSupports(b, (Brick[])bricks.Clone(), i));
+            bricks.Sum((b, i) => CountAllSupports(b, bricks.ToArray(), i));
 
         private static void Drop(Brick[] bricks)
         {
@@ -40,10 +40,10 @@ namespace aoc.aoc2023.day22
                 .Sum(j => 1 + CountAllSupports(bricks[j], bricks, j));
         }
 
-        private static int? CountSupports(Brick brick, Brick[] bricks, int i) =>
+        private static int CountSupports(Brick brick, Brick[] bricks, int i) =>
             Supports(brick, bricks[i])
                 ? bricks[..i].Count(b => Supports(b, bricks[i]))
-                : null;
+                : -1;
 
         private static bool Supports(Brick brick, Brick brick2) =>
             brick.Max.z == brick2.Min.z - 1 && IsMatch(brick2, brick);
