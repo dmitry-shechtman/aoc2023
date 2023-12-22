@@ -19,7 +19,7 @@ namespace aoc.aoc2023.day22
         private static int Part1(Brick[] bricks) =>
             bricks.Count(b => bricks.All((b2, i) => CountSupports(b, bricks, i) != 1));
 
-        private static long Part2(Brick[] bricks) =>
+        private static int Part2(Brick[] bricks) =>
             bricks.Sum((b, i) => CountAllSupports(b, (Brick[])bricks.Clone(), i));
 
         private static void Drop(Brick[] bricks)
