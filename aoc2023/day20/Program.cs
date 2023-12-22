@@ -23,14 +23,14 @@ namespace aoc.aoc2023.day20
 
         public long Low
         {
-            get => (uint)counts;
-            set => counts = counts >> CountsShift << CountsShift | value;
+            get => counts << CountsShift >> CountsShift;
+            set => counts = High << CountsShift | value;
         }
 
         public long High
         {
             get => counts >> CountsShift;
-            set => counts = value << CountsShift | (uint)counts;
+            set => counts = value << CountsShift | Low;
         }
 
         public long Product => Low * High;
