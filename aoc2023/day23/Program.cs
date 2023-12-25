@@ -30,7 +30,7 @@ namespace aoc.aoc2023.day23
         {
             var idxStart = Start.GetIndex(size);
             var idxEnd = (size - DeltaEnd).GetIndex(size);
-            var output = new int[size.Count];
+            var output = new int[size.Length];
             var visited = CreateVisited(idxStart, size);
             var deltas = CreateDeltas(size);
             FindLongestPath(idxStart, StartHeading, StartDistance, input, output, visited, deltas);
@@ -54,7 +54,7 @@ namespace aoc.aoc2023.day23
 
         private static BitArray CreateVisited(int idxStart, Vector size)
         {
-            BitArray visited = new(size.Count);
+            BitArray visited = new(size.Length);
             visited[idxStart] = true;
             return visited;
         }
