@@ -31,8 +31,8 @@ namespace aoc.aoc2023.day24
             var (p1, v1) = pv1;
             var (p2, v2) = pv2;
             bool result;
-            sb.AppendLine($"Hailstone A: {p1.x}, {p1.y}, {p1.z} @ {v1.x}, {v1.y}, {v1.z}");
-            sb.AppendLine($"Hailstone B: {p2.x}, {p2.y}, {p2.z} @ {v2.x}, {v2.y}, {v2.z}");
+            sb.AppendLine($"Hailstone A: {p1:x, y, z} @ {v1:x, y, z}");
+            sb.AppendLine($"Hailstone B: {p2:x, y, z} @ {v2:x, y, z}");
             DoubleMatrix a = (v1.x, -v2.x, v1.y, -v2.y);
             DoubleVector b = (p2.x - p1.x, p2.y - p1.y);
             if (!a.Solve(b, out DoubleVector x))
