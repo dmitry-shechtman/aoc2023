@@ -33,14 +33,16 @@ namespace aoc.aoc2023.day24
             bool result;
             sb.AppendLine($"Hailstone A: {p1.x}, {p1.y}, {p1.z} @ {v1.x}, {v1.y}, {v1.z}");
             sb.AppendLine($"Hailstone B: {p2.x}, {p2.y}, {p2.z} @ {v2.x}, {v2.y}, {v2.z}");
-            if (!DoubleMatrix.Invert((v1.x, -v2.x, v1.y, -v2.y), out var inv))
+            DoubleMatrix a = (v1.x, -v2.x, v1.y, -v2.y);
+            DoubleVector b = (p2.x - p1.x, p2.y - p1.y);
+            if (!a.Solve(b, out DoubleVector x))
             {
                 sb.Append("Hailstones' paths are parallel; they never intersect");
                 result = false;
             }
             else
             {
-                var (t1, t2) = inv * (p2.x - p1.x, p2.y - p1.y);
+                var (t1, t2) = x;
                 if (t1 < 0 || t2 < 0)
                 {
                     sb.Append("Hailstones' paths crossed in the past for ");
@@ -49,11 +51,11 @@ namespace aoc.aoc2023.day24
                 }
                 else
                 {
-                    var (x, y) = (v1.x * t1 + p1.x, v1.y * t1 + p1.y);
-                    result = range.IsMatch((x, y));
+                    DoubleVector p = (v1.x * t1 + p1.x, v1.y * t1 + p1.y);
+                    result = range.IsMatch(p);
                     sb.Append("Hailstones' paths will cross ");
                     sb.Append(result ? "inside" : "outside");
-                    sb.Append($" the test area (at x={x:.###}, y={y:.###})");
+                    sb.Append($" the test area (at x={p.x:.###}, y={p.y:.###})");
                 }
             }
             sb.AppendLine(".");
