@@ -20,16 +20,16 @@ namespace aoc.aoc2023.day23
             Console.WriteLine(Part2(input, size));
         }
 
-        private static int Part1(int[] input, Vector size) =>
+        private static int Part1(int[] input, Size size) =>
             Solve(input, size);
 
-        private static int Part2(int[] input, Vector size) =>
+        private static int Part2(int[] input, Size size) =>
             Solve(input.Select(v => v == Forest ? Forest : Empty).ToArray(), size);
 
-        private static int Solve(int[] input, Vector size)
+        private static int Solve(int[] input, Size size)
         {
-            var idxStart = Start.GetIndex(size);
-            var idxEnd = (size - DeltaEnd).GetIndex(size);
+            var idxStart = size.GetIndex(Start);
+            var idxEnd = size.GetIndex((Vector)size - DeltaEnd);
             var output = new int[size.Length];
             var visited = CreateVisited(idxStart, size);
             var deltas = CreateDeltas(size);
@@ -52,14 +52,14 @@ namespace aoc.aoc2023.day23
             visited[index] = false;
         }
 
-        private static BitArray CreateVisited(int idxStart, Vector size)
+        private static BitArray CreateVisited(int idxStart, Size size)
         {
             BitArray visited = new(size.Length);
             visited[idxStart] = true;
             return visited;
         }
 
-        private static int[][] CreateDeltas(Vector size) => new[]
+        private static int[][] CreateDeltas(Size size) => new[]
         {
             new[] { -size.x, 1, size.x, -1 },
             new[] { 1 },
@@ -67,15 +67,15 @@ namespace aoc.aoc2023.day23
             Array.Empty<int>()
         };
 
-        private static int[] Parse(string path, out Vector size)
+        private static int[] Parse(string path, out Size size)
         {
             var s = File.ReadAllText(path);
-            size = Vector.FromField(s);
+            size = Size.FromField(s);
             var input = s.Replace("\n", "")
                 .Select(c => ".>v#".IndexOf(c))
                 .ToArray();
-            Vector.SetValue(PreStart, input, Forest, size);
-            Vector.SetValue(size - DeltaPostEnd, input, Forest, size);
+            size.SetValue(input, PreStart, Forest);
+            size.SetValue(input, (Vector)size - DeltaPostEnd, Forest);
             return input;
         }
     }

@@ -16,14 +16,14 @@ namespace aoc.aoc2023.day21
             Console.WriteLine(Part2(bb, start, t));
         }
 
-        private static int Part1(bool[] bb, Vector start, Vector t)
+        private static int Part1(bool[] bb, Vector start, Size t)
         {
             var pp = new[] { start };
             int i = 0;
             return Count(ref pp, ref i, Steps1, bb, t);
         }
 
-        private static long Part2(bool[] bb, Vector start, Vector t)
+        private static long Part2(bool[] bb, Vector start, Size t)
         {
             var pp = new[] { start };
             var x = Steps2 / t.x;
@@ -39,24 +39,24 @@ namespace aoc.aoc2023.day21
             return a * x * x + (aPlusB - a) * x + c;
         }
 
-        private static int Count(ref Vector[] pp, ref int i, int steps, bool[] bb, Vector t)
+        private static int Count(ref Vector[] pp, ref int i, int steps, bool[] bb, Size t)
         {
             int dx = steps / t.x * t.x;
             int dy = steps / t.y * t.y;
             for (; i < steps; ++i)
                 pp = pp.SelectMany(Vector.GetNeighborsJVN)
                     .AsParallel()
-                    .Where(p => Vector.GetValue(((p.x + dx) % t.x, (p.y + dy) % t.y), bb, t))
+                    .Where(p => t.GetValue(bb, ((p.x + dx) % t.x, (p.y + dy) % t.y)))
                     .Distinct()
                     .ToArray();
             return pp.Length;
         }
 
-        private static bool[] Parse(string path, out Vector t, out Vector start)
+        private static bool[] Parse(string path, out Size t, out Vector start)
         {
             var s = File.ReadAllText(path);
-            t = Vector.FromField(s);
-            start = Vector.FindChar(s, 'S');
+            t = Size.FromField(s);
+            start = t.FindChar(s, 'S');
             return s.Replace("\n", "")
                 .Select(c => c != '#')
                 .ToArray();

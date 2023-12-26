@@ -24,10 +24,10 @@ namespace aoc.aoc2023.day16
 
         private static int Energize(Vector p, int h, string s, int[] a, VectorRange r)
         {
-            if (!p.TryGetValue(a, r, out int m) ||
-                p.SetValue(a, m | 1 << h, r) == m)
+            if (!r.TryGetValue(a, p, out int m) ||
+                r.SetValue(a, p, m | 1 << h) == m)
                     return 0;
-            int i = "|-./?\\".IndexOf(p.GetChar(s, r));
+            int i = "|-./?\\".IndexOf(p.GetChar(s));
             h = i > 1 ? h ^ i - 2 : h;
             return (m == 0 ? 1 : 0) + (((h & 1) ^ 1) != i
                 ? Energize(p + Vector.Headings[h], h, s, a, r)
