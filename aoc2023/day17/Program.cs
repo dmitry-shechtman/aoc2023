@@ -32,12 +32,14 @@ namespace aoc.aoc2023.day17
 
         private static int Solve(int[] input, VectorRange r2d, int minCount, int maxCount, Func<int, int, int, bool> match)
         {
+            Vector4D min = (r2d.Max, MinHeading, minCount);
             Vector4D max = (r2d.Max, MaxHeading, maxCount);
-            Size4D size = (Size4D)(max + (1, 1, 1, 1));
+            Vector4DRange range = (min, max);
+            Size4D size = new(range);
             int[] losses = new int[size.Length];
             Vector4D[] init = { ((0, 0), East, 0), ((0, 0), South, 0) };
             init.AsParallel().ForAll(v => Walk(input, losses, size, match, v));
-            return new Vector4DRange((r2d.Max, MinHeading, minCount), max)
+            return range
                 .Select(p => size.GetValue(losses, p))
                 .Where(v => v > 0)
                 .Min();
