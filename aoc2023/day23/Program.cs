@@ -61,9 +61,9 @@ namespace aoc.aoc2023.day23
 
         private static int[][] CreateDeltas(Size size) => new[]
         {
-            new[] { -size.x, 1, size.x, -1 },
+            new[] { -size.width, 1, size.width, -1 },
             new[] { 1 },
-            new[] { size.x },
+            new[] { size.width },
             Array.Empty<int>()
         };
 
