@@ -65,7 +65,7 @@ namespace aoc.aoc2023.day24
 
         private static LongParticle3D[] Parse(string path) =>
             File.ReadAllLines(path)
-                .Select(s => LongParticle3D.Parse(s, '@'))
+                .Select(LongParticle3D.Parse)
                 .ToArray();
     }
 }
