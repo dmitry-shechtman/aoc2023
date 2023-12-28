@@ -15,12 +15,12 @@ namespace aoc.aoc2023.day16
         }
 
         private static int Part1(string s, VectorRange r) =>
-            Energize(Vector.Zero, 1, s, new int[r.Count], r);
+            Energize(Vector.Zero, 1, s, new int[r.Length], r);
 
         private static int Part2(string s, VectorRange r) =>
             r.Border()
                 .Max(p => Enumerable.Range(0, 4)
-                    .Max(h => Energize(p, h, s, new int[r.Count], r)));
+                    .Max(h => Energize(p, h, s, new int[r.Length], r)));
 
         private static int Energize(Vector p, int h, string s, int[] a, VectorRange r)
         {
