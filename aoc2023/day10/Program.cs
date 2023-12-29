@@ -1,4 +1,5 @@
-﻿using System;
+﻿using aoc.Grids;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,31 +15,31 @@ namespace aoc.aoc2023.day10
             var s = File.ReadAllText(args[0]);
             Vector p = FindChar(s, 'S');
             var vv = Headings.Where(v => GetNext(s, p + v, v) != Zero);
-            HashSet<Vector> pp = new();
-            Console.WriteLine(Part1(s, p, vv, pp));
-            Console.WriteLine(Part2(s, p, vv, pp));
+            Grid grid = new();
+            Console.WriteLine(Part1(s, p, vv, grid));
+            Console.WriteLine(Part2(s, p, vv, grid));
         }
 
-        private static int Part1(string s, Vector p, IEnumerable<Vector> vv, HashSet<Vector> pp) =>
-            MaxDistance(s, p, vv.First(), pp);
+        private static int Part1(string s, Vector p, IEnumerable<Vector> vv, Grid grid) =>
+            MaxDistance(s, p, vv.First(), grid);
 
-        private static int Part2(string s, Vector p, IEnumerable<Vector> vv, HashSet<Vector> pp) =>
+        private static int Part2(string s, Vector p, IEnumerable<Vector> vv, Grid grid) =>
             vv.Zip(new[] { Matrix.RotateRight, Matrix.RotateLeft })
-                .Sum(t => CountFill(s, p, t.First, t.Second, pp));
+                .Sum(t => CountFill(s, p, t.First, t.Second, grid));
 
-        private static int MaxDistance(string s, Vector p, Vector v, HashSet<Vector> pp)
+        private static int MaxDistance(string s, Vector p, Vector v, Grid grid)
         {
             int d = 0;
             for (p += v; v != Zero; p += v = GetNext(s, p, v), ++d)
-                pp.Add(p);
+                grid.Add(p);
             return d / 2;
         }
 
-        private static int CountFill(string s, Vector p, Vector v, Matrix m, HashSet<Vector> pp)
+        private static int CountFill(string s, Vector p, Vector v, Matrix m, Grid grid)
         {
             int count = 0;
             for (p += v; v != Zero; p += v = GetNext(s, p, v))
-                count += FloodFill(p + v * m, pp);
+                count += grid.FloodFill(p + v * m);
             return count;
         }
 

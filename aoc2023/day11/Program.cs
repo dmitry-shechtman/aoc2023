@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using aoc.Grids;
+using System;
 using System.IO;
 using System.Linq;
 
@@ -9,17 +9,16 @@ namespace aoc.aoc2023.day11
     {
         static void Main(string[] args)
         {
-            var s = File.ReadAllText(args[0]);
-            var pp = Vector.ParseField(s);
-            Console.WriteLine(Part1(pp));
-            Console.WriteLine(Part2(pp));
+            var grid = Parse(args[0]);
+            Console.WriteLine(Part1(grid));
+            Console.WriteLine(Part2(grid));
         }
 
-        private static long Part1(HashSet<Vector> pp) =>
-            Solve(pp.ToArray(), 1);
+        private static long Part1(Grid grid) =>
+            Solve(grid.ToArray(), 1);
 
-        private static long Part2(HashSet<Vector> pp) =>
-            Solve(pp.ToArray(), 999999);
+        private static long Part2(Grid grid) =>
+            Solve(grid.ToArray(), 999999);
 
         private static long Solve(Span<Vector> a, int n) =>
             Expand(a, n, p => p.x, (p, v) => (p.x + v, p.y)) +
@@ -40,5 +39,8 @@ namespace aoc.aoc2023.day11
             }
             return total;
         }
+
+        private static Grid Parse(string path) =>
+            Grid.Parse(File.ReadAllText(path));
     }
 }

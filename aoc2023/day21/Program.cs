@@ -1,4 +1,5 @@
-﻿using System;
+﻿using aoc.Grids;
+using System;
 using System.IO;
 using System.Linq;
 
@@ -18,19 +19,19 @@ namespace aoc.aoc2023.day21
 
         private static int Part1(bool[] bb, Vector start, Size t)
         {
-            var pp = new[] { start };
+            var grid = new Grid(start);
             int i = 0;
-            return Count(ref pp, ref i, Steps1, bb, t);
+            return Count(ref grid, ref i, Steps1, bb, t);
         }
 
         private static long Part2(bool[] bb, Vector start, Size t)
         {
-            var pp = new[] { start };
+            var grid = new Grid(start);
             var x = Steps2 / t.width;
             var y = Steps2 % t.width;
             var cc = new long[3];
             for (int n = 0, i = 0; n < cc.Length; ++n)
-                cc[n] = Count(ref pp, ref i, n * t.width + y, bb, t);
+                cc[n] = Count(ref grid, ref i, n * t.width + y, bb, t);
             var c = cc[0];
             var aPlusB = cc[1] - c;
             var fourAPlusTwoB = cc[2] - c;
@@ -39,17 +40,15 @@ namespace aoc.aoc2023.day21
             return a * x * x + (aPlusB - a) * x + c;
         }
 
-        private static int Count(ref Vector[] pp, ref int i, int steps, bool[] bb, Size t)
+        private static int Count(ref Grid grid, ref int i, int steps, bool[] bb, Size t)
         {
             int dx = steps / t.width * t.width;
             int dy = steps / t.height * t.height;
             for (; i < steps; ++i)
-                pp = pp.SelectMany(Vector.GetNeighborsJVN)
+                grid = new(grid.SelectMany(grid.GetNeighbors)
                     .AsParallel()
-                    .Where(p => t.GetValue(bb, ((p.x + dx) % t.width, (p.y + dy) % t.height)))
-                    .Distinct()
-                    .ToArray();
-            return pp.Length;
+                    .Where(p => t.GetValue(bb, ((p.x + dx) % t.width, (p.y + dy) % t.height))));
+            return grid.Count;
         }
 
         private static bool[] Parse(string path, out Size t, out Vector start)

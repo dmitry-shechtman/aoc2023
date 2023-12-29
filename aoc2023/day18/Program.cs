@@ -1,4 +1,5 @@
-﻿using System;
+﻿using aoc.Grids;
+using System;
 using System.IO;
 using System.Linq;
 
@@ -29,7 +30,7 @@ namespace aoc.aoc2023.day18
         }
 
         private static Vector[] Parse1(string[] ss) =>
-            Vector.ParsePath(ss, ' ')
+            Grid.ParsePath(ss, ' ')
                 .Select(t => t.v * t.d)
                 .ToArray();
 
