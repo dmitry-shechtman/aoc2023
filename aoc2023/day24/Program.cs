@@ -18,7 +18,7 @@ namespace aoc.aoc2023.day24
 
         private static int Part1(LongParticle3D[] hail) =>
             hail.Sum((pv1, i) => hail[(i + 1)..].Count(pv2 =>
-                CrossPaths(pv1, pv2, ((Min, Min), (Max, Max)), new())));
+                CrossPaths(pv1, pv2, new(Min, Max), new())));
 
         // Solves for t1 and t2:
         //
