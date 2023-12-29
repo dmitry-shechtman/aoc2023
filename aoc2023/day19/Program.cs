@@ -35,7 +35,7 @@ namespace aoc.aoc2023.day19
             parts.Sum(p => Process(InKey, p, workflows));
 
         private static int Process(string key, Part part, Workflows workflows) =>
-            Process(workflows[key].First(r => r.Range.IsMatch(part)), part, workflows);
+            Process(workflows[key].First(r => r.Range.Contains(part)), part, workflows);
 
         private static int Process(Rule rule, Part part, Workflows workflows) => rule.Dest switch
         {

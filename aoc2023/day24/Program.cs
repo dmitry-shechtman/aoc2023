@@ -52,7 +52,7 @@ namespace aoc.aoc2023.day24
                 else
                 {
                     DoubleVector p = (v1.x * t1 + p1.x, v1.y * t1 + p1.y);
-                    result = range.IsMatch(p);
+                    result = range.Contains(p);
                     sb.Append("Hailstones' paths will cross ");
                     sb.Append(result ? "inside" : "outside");
                     sb.Append($" the test area (at x={p.x:.###}, y={p.y:.###})");

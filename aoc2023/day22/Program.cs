@@ -53,7 +53,7 @@ namespace aoc.aoc2023.day22
             brick.Max.z < brick2.Min.z && IsMatch(brick2, brick);
 
         private static bool IsMatch(Brick brick, Brick brick2) =>
-            ((VectorRange)brick).IsMatch((VectorRange)brick2);
+            ((VectorRange)brick).Overlaps((VectorRange)brick2);
 
         private static Brick[] Parse(string path) =>
             File.ReadAllLines(path)
