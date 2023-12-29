@@ -21,7 +21,7 @@ namespace aoc.aoc2023.day05
             public long Transform(long value) =>
                 value + Dest.Min - Source.Min;
 
-            public LongRange Transform(LongRange range) =>
+            public IEnumerable<LongRange> Transform(LongRange range) =>
                 Dest.Intersect((Transform(range.Min), Transform(range.Max)));
         }
 
@@ -34,7 +34,7 @@ namespace aoc.aoc2023.day05
                 Entries.Where(m => m.Source.Contains(value)).Select(m => m.Transform(value));
 
             public IEnumerable<LongRange> Transform(LongRange range) =>
-                Entries.Where(m => m.Source.Overlaps(range)).Select(m => m.Transform(range));
+                Entries.SelectMany(m => m.Transform(range));
         }
 
         static void Main(string[] args)

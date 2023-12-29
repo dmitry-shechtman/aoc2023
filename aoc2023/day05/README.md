@@ -284,19 +284,7 @@ A *map* transforms a *range* by passing it to all entries with matching source r
     {
         //...
         public IEnumerable<LongRange> Transform(LongRange range) =>
-            Entries.Where(m => m.Source.Overlaps(range)).Select(m => m.Transform(range));
-    }
-```
-
-A *range* matches another *range* by checking whether the two overlap:
-
-```C#
-    struct LongRange
-    {
-        //...
-        public bool Overlaps(LongRange other) =>
-            other.Min <= Max && other.Max >= Min;
-        //...
+            Entries.SelectMany(m => m.Transform(range));
     }
 ```
 
@@ -308,7 +296,7 @@ the transformed minimum to the transformed maximum:
     record Entry //...
     {
         //...
-        public LongRange Transform(LongRange range) =>
+        public IEnumerable<LongRange> Transform(LongRange range) =>
             Dest.Intersect((Transform(range.Min), Transform(range.Max)));
     }
 ```
@@ -320,8 +308,24 @@ the maximum of the two minima to the minimum of the two maxima:
     struct LongRange
     {
         //...
-        public LongRange Intersect(LongRange other) =>
-            new(Math.Max(Min, other.Min), Math.Min(Max, other.Max));
+        public readonly bool Intersect(LongRange other, out LongRange result)
+        {
+            result = new(Math.Max(Min, other.Min), Math.Min(Max, other.Max));
+            return Overlaps(other);
+        }
+        //...
+    }
+```
+
+A *range* checks whether it overlaps with another *range*
+by comparing its maximum to the other's minimum and vice versa:
+
+```C#
+    struct LongRange
+    {
+        //...
+        public bool Overlaps(LongRange other) =>
+            other.Min <= Max && other.Max >= Min;
         //...
     }
 ```
