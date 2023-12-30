@@ -13,12 +13,12 @@ namespace aoc.aoc2023.day24
         static void Main(string[] args)
         {
             var hail = Parse(args[0]);
-            Console.WriteLine(Part1(hail));
+            Console.WriteLine(Part1(hail, new()));
         }
 
-        private static int Part1(LongParticle3D[] hail) =>
+        private static int Part1(LongMatrix3D[] hail, StringBuilder sb) =>
             hail.Sum((pv1, i) => hail[(i + 1)..].Count(pv2 =>
-                CrossPaths(pv1, pv2, new(Min, Max), new())));
+                CrossPaths(pv1, pv2, new(Min, Max), sb)));
 
         // Solves for t1 and t2:
         //
@@ -26,7 +26,7 @@ namespace aoc.aoc2023.day24
         // v1.y * t1 - v2.y * t2 == p2.y - p1.y
         //
         // Returns true if t1 >= 0 and t2 >= 0.
-        private static bool CrossPaths(LongParticle3D pv1, LongParticle3D pv2, DoubleVectorRange range, StringBuilder sb)
+        private static bool CrossPaths(LongMatrix3D pv1, LongMatrix3D pv2, DoubleVectorRange range, StringBuilder sb)
         {
             var (p1, v1) = pv1;
             var (p2, v2) = pv2;
@@ -63,9 +63,9 @@ namespace aoc.aoc2023.day24
             return result;
         }
 
-        private static LongParticle3D[] Parse(string path) =>
+        private static LongMatrix3D[] Parse(string path) =>
             File.ReadAllLines(path)
-                .Select(LongParticle3D.Parse)
+                .Select(s => LongMatrix3D.Parse(s, '@'))
                 .ToArray();
     }
 }
