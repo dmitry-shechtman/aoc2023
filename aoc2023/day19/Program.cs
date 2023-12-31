@@ -94,9 +94,6 @@ namespace aoc.aoc2023.day19
             Enumerable.Range(0, Cardinality).Select(i => i == coord ? value : defaultValue).ToArray();
 
         private static Part[] ParseParts(string s) =>
-            s.Split('\n').Select(ParsePart).ToArray();
-
-        private static Part ParsePart(string v) =>
-            PartRegex.Split(v)[1..5].Select(int.Parse).ToArray();
+            s.Split('\n').Select(t => Part.Parse(t, PartRegex)).ToArray();
     }
 }
