@@ -8,97 +8,109 @@ namespace aoc.aoc2023.day24
 {
     static class Program
     {
-        private const long Min = 200000000000000;
-        private const long Max = 400000000000000;
-
         static void Main(string[] args)
         {
             var hail = Parse(args[0]);
-            StringBuilder sb = new();
-            Console.WriteLine(Part1(hail, sb));
-            Console.WriteLine(Part2(hail, sb));
+            var min = args.Length > 1 ? long.Parse(args[1]) : 200000000000000;
+            var max = args.Length > 2 ? long.Parse(args[2]) : 400000000000000;
+            Console.WriteLine(Part1(hail, (min, max), null));
+            Console.WriteLine(Part2(hail, null));
         }
 
-        private static int Part1(LongMatrix3D[] hail, StringBuilder sb) =>
+        private static int Part1(LongMatrix3D[] hail, DoubleVectorRange range, StringBuilder sb) =>
             hail.Sum((pv1, i) => hail[(i + 1)..].Count(pv2 =>
-                CrossPaths(pv1, pv2, new(Min, Max), sb)));
+                CrossPaths(pv1, pv2, range, sb)));
 
         private static long Part2(LongMatrix3D[] hail, StringBuilder sb)
         {
-            var (p1, v1) = hail[0];
-            var (p2, v2) = hail[1];
-            var (p3, v3) = hail[2];
-
-            // Column-major order
-            var a = Matrix<double>.Build.Dense(6, 6, new double[]
-            {
-                v2.y - v1.y, v3.y - v1.y, v2.z - v1.z, v3.z - v1.z,           0,           0,
-                v1.x - v2.x, v1.x - v3.x,           0,           0, v1.z - v2.z, v1.z - v3.z,
-                          0,           0, v1.x - v2.x, v1.x - v3.x, v2.y - v1.y, v3.y - v1.y,
-                p1.y - p2.y, p1.y - p3.y, p1.z - p2.z, p1.z - p3.z,           0,           0,
-                p2.x - p1.x, p3.x - p1.x,           0,           0, p2.z - p1.z, p3.z - p1.z,
-                          0,           0, p2.x - p1.x, p3.x - p1.x, p1.y - p2.y, p1.y - p3.y
-            });
-
-            var b = Vector<double>.Build.Dense(new double[]
-            {
-                 p2.x * v2.y - p2.y * v2.x - p1.x * v1.y + p1.y * v1.x,
-                 p3.x * v3.y - p3.y * v3.x - p1.x * v1.y + p1.y * v1.x,
-                 p2.x * v2.z - p2.z * v2.x - p1.x * v1.z + p1.z * v1.x,
-                 p3.x * v3.z - p3.z * v3.x - p1.x * v1.z + p1.z * v1.x,
-                -p2.y * v2.z + p2.z * v2.y + p1.y * v1.z - p1.z * v1.y,
-                -p3.y * v3.z + p3.z * v3.y + p1.y * v1.z - p1.z * v1.y
-            });
-
-            var x = a.Solve(b);
-            var values = x.Select(v => (long)Math.Round(v)).ToArray();
-            var pv0 = (values[..3], values[3..]);
-
-            foreach (var pv in hail)
-            {
-                Intersect(pv0, pv, out var t, out var p);
-                sb.Append("Hailstone: ").AppendHailstone(pv).AppendLine();
-                sb.AppendLine($"Collision time: {t.x}");
-                sb.Append("Collision position: ");
-                sb.AppendVector((LongVector3D)p);
-                sb.AppendLine();
-                sb.AppendLine();
-            }
-
-            return values[..3].Sum();
+            var rock = GetRock(hail);
+            if (sb is not null)
+                sb.AppendCollisions(hail, rock);
+            return rock.R1.Sum();
         }
 
-        // Solves for t1 and t2:
-        //
-        // v1.x * t1 - v2.x * t2 == p2.x - p1.x
-        // v1.y * t1 - v2.y * t2 == p2.y - p1.y
-        //
-        // Returns true if t1 >= 0 and t2 >= 0
-        // and the intersection is within range.
+        /// <summary>
+        /// Solves for t1 and t2:
+        ///
+        /// v1.x * t1 - v2.x * t2 == p2.x - p1.x
+        /// v1.y * t1 - v2.y * t2 == p2.y - p1.y
+        /// </summary>
+        /// 
+        /// <returns>
+        /// true if t1 >= 0 and t2 >= 0
+        /// and the intersection is within range.
+        /// </returns>
         private static bool CrossPaths(LongMatrix3D pv1, LongMatrix3D pv2, DoubleVectorRange range, StringBuilder sb)
         {
-            sb.Append("Hailstone A: ").AppendHailstone(pv1).AppendLine();
-            sb.Append("Hailstone B: ").AppendHailstone(pv2).AppendLine();
+            sb?.Append("Hailstone A: ")
+                .AppendHailstone(pv1).AppendLine()
+                .Append("Hailstone B: ")
+                .AppendHailstone(pv2).AppendLine();
             if (!Intersect(pv1, pv2, out DoubleVector x, out DoubleVector3D p))
             {
-                sb.AppendLine("Hailstones' paths are parallel; they never intersect.");
-                sb.AppendLine();
+                sb?.AppendLine("Hailstones' paths are parallel; they never intersect.")
+                    .AppendLine();
                 return false;
             }
             var (t1, t2) = x;
             if (t1 < 0 || t2 < 0)
             {
-                sb.Append("Hailstones' paths crossed in the past for ");
-                sb.AppendLine(t1 < 0 && t2 < 0 ? "both hailstones." : t1 < 0 ? "hailstone A." : "hailstone B.");
-                sb.AppendLine();
+                sb?.Append("Hailstones' paths crossed in the past for ")
+                    .AppendLine(t1 < 0 && t2 < 0 ? "both hailstones." : t1 < 0 ? "hailstone A." : "hailstone B.")
+                    .AppendLine();
                 return false;
             }
             bool result = range.Contains((DoubleVector)p);
-            sb.Append("Hailstones' paths will cross ");
-            sb.Append(result ? "inside" : "outside");
-            sb.AppendLine($" the test area (at x={p.x:.###}, y={p.y:.###}).");
-            sb.AppendLine();
+            sb?.Append("Hailstones' paths will cross ")
+                .Append(result ? "inside" : "outside")
+                .AppendLine($" the test area (at x={p.x:.###}, y={p.y:.###}).")
+                .AppendLine();
             return result;
+        }
+
+        /// <summary>
+        /// Solves for x, y, z, dx, dy and dz:
+        /// 
+        /// (dy2 - dy1) * x + (dx1 - dx2) * y + (y1 - y2) * dx + (x2 - x1) * dy ==  x2 * dy2 - y2 * dx2 - x1 * dy1 + y1 * dx1
+        /// (dy3 - dy1) * x + (dx1 - dx3) * y + (y1 - y3) * dx + (x3 - x1) * dy ==  x3 * dy3 - y3 * dx3 - x1 * dy1 + y1 * dx1
+        /// (dz2 - dz1) * x + (dx1 - dx2) * z + (z1 - z2) * dx + (x2 - x1) * dz ==  x2 * dz2 - z2 * dx2 - x1 * dz1 + z1 * dx1
+        /// (dz3 - dz1) * x + (dx1 - dx3) * z + (z1 - z3) * dx + (x3 - x1) * dz ==  x3 * dz3 - z3 * dx3 - x1 * dz1 + z1 * dx1
+        /// (dz1 - dz2) * y + (dy2 - dy1) * z + (z2 - z1) * dy + (y1 - y2) * dz == -y2 * dz2 + z2 * dy2 + y1 * dz1 - z1 * dy1
+        /// (dz1 - dz3) * y + (dy3 - dy1) * z + (z3 - z1) * dy + (y1 - y3) * dz == -y3 * dz3 + z3 * dy3 + y1 * dz1 - z1 * dy1
+        /// </summary>
+        /// 
+        /// <returns>
+        /// ((x, y, z), (dx, dy, dz)).
+        /// </returns>
+        private static LongMatrix3D GetRock(LongMatrix3D[] hail)
+        {
+            var ((x1, y1, z1), (dx1, dy1, dz1)) = hail[0];
+            var ((x2, y2, z2), (dx2, dy2, dz2)) = hail[1];
+            var ((x3, y3, z3), (dx3, dy3, dz3)) = hail[2];
+
+            var a = Matrix<double>.Build.Dense(6, 6);
+            a.SetRow(0, new double[] { dy2 - dy1, dx1 - dx2,         0, y1 - y2, x2 - x1,       0 });
+            a.SetRow(1, new double[] { dy3 - dy1, dx1 - dx3,         0, y1 - y3, x3 - x1,       0 });
+            a.SetRow(2, new double[] { dz2 - dz1,         0, dx1 - dx2, z1 - z2,       0, x2 - x1 });
+            a.SetRow(3, new double[] { dz3 - dz1,         0, dx1 - dx3, z1 - z3,       0, x3 - x1 });
+            a.SetRow(4, new double[] {         0, dz1 - dz2, dy2 - dy1,       0, z2 - z1, y1 - y2 });
+            a.SetRow(5, new double[] {         0, dz1 - dz3, dy3 - dy1,       0, z3 - z1, y1 - y3 });
+
+            var b = Vector<double>.Build.Dense(new double[]
+            {
+                 x2 * dy2 - y2 * dx2 - x1 * dy1 + y1 * dx1,
+                 x3 * dy3 - y3 * dx3 - x1 * dy1 + y1 * dx1,
+                 x2 * dz2 - z2 * dx2 - x1 * dz1 + z1 * dx1,
+                 x3 * dz3 - z3 * dx3 - x1 * dz1 + z1 * dx1,
+                -y2 * dz2 + z2 * dy2 + y1 * dz1 - z1 * dy1,
+                -y3 * dz3 + z3 * dy3 + y1 * dz1 - z1 * dy1
+            });
+
+            var values = a.Solve(b)
+                .Select(v => (long)Math.Round(v))
+                .ToArray();
+
+            return (values[..3], values[3..]);
         }
 
         private static bool Intersect(LongMatrix3D pv1, LongMatrix3D pv2, out DoubleVector t, out DoubleVector3D p)
@@ -114,13 +126,26 @@ namespace aoc.aoc2023.day24
             return true;
         }
 
-        private static StringBuilder AppendHailstone(this StringBuilder sb, LongMatrix3D pv)
+        private static StringBuilder AppendCollisions(this StringBuilder sb, LongMatrix3D[] hail, LongMatrix3D rock)
         {
-            sb.AppendVector(pv.R1);
-            sb.Append(" @ ");
-            sb.AppendVector(pv.R2);
+            foreach (var pv in hail)
+            {
+                Intersect(rock, pv, out var t, out var p);
+                sb.Append("Hailstone: ")
+                    .AppendHailstone(pv).AppendLine()
+                    .AppendLine($"Collision time: {t.x}")
+                    .Append("Collision position: ")
+                    .AppendVector((LongVector3D)p)
+                    .AppendLine()
+                    .AppendLine();
+            }
             return sb;
         }
+
+        private static StringBuilder AppendHailstone(this StringBuilder sb, LongMatrix3D pv) =>
+            sb.AppendVector(pv.R1)
+                .Append(" @ ")
+                .AppendVector(pv.R2);
 
         private static StringBuilder AppendVector(this StringBuilder sb, LongVector3D p) =>
             sb.AppendFormat("{0:x, y, z}", p);
