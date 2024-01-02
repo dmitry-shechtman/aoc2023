@@ -14,7 +14,7 @@ namespace aoc.aoc2023.day10
         {
             var s = File.ReadAllText(args[0]);
             Vector p = FindChar(s, 'S');
-            var vv = Headings.Where(v => GetNext(s, p + v, v) != Zero);
+            var vv = Grid.Headings.Where(v => GetNext(s, p + v, v) != Zero);
             Grid grid = new();
             Console.WriteLine(Part1(s, p, vv, grid));
             Console.WriteLine(Part2(s, p, vv, grid));

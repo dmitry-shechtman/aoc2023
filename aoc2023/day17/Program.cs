@@ -1,4 +1,5 @@
-﻿using System;
+﻿using aoc.Grids;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -60,7 +61,7 @@ namespace aoc.aoc2023.day17
         private static void Process(Vector4D curr, int loss, int heading2, int[] input, Queue<Vector4D> candidates, int[] losses, Size4D size)
         {
             var (curr2d, heading, count) = curr;
-            Vector next2d = curr2d + Vector.Headings[heading2];
+            Vector next2d = curr2d + Grid.Headings[heading2];
             int count2 = heading2 == heading ? count + 1 : 1;
             Vector4D next = (next2d, heading2, count2);
             if (size.Contains(next))

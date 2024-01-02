@@ -43,7 +43,7 @@ namespace aoc.aoc2023.day18
             var t = s.Split(' ')[2][2..^1];
             var bytes = Convert.FromHexString($"{t[4..]}{t[2..4]}{t[..2]}00");
             int i = BitConverter.ToInt32(bytes);
-            return Vector.Headings[(i + 1) % 4] * (i >> 4);
+            return Grid.Headings[(i + 1) % 4] * (i >> 4);
         }
     }
 }
