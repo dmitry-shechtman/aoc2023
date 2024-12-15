@@ -1,4 +1,5 @@
-﻿using System;
+﻿using aoc.Grids;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -43,7 +44,7 @@ namespace aoc.aoc2023.day17
                 {
                     if (match(heading, count, i))
                     {
-                        var (x2, y2) = Vector.Headings[i];
+                        var (x2, y2) = Grid.Headings[i];
                         if (x2 >= 0 && y2 >= 0 && x2 < size.x && y2 < size.y)
                         {
                             int count2 = i == heading ? count + 1 : 1;
@@ -84,7 +85,7 @@ namespace aoc.aoc2023.day17
             int count2 = heading2 == heading ? count + 1 : 1;
             if (count2 < size.count)
             {
-                var (x2, y2) = (x, y) + Vector.Headings[heading2];
+                var (x2, y2) = (x, y) + Grid.Headings[heading2];
                 if (x2 >= 0 && y2 >= 0 && x2 < size.x && y2 < size.y)
                 {
                     var next = (x2, y2, heading2, count2);
