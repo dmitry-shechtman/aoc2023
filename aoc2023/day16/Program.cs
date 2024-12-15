@@ -1,4 +1,5 @@
-﻿using System;
+﻿using aoc.Grids;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,10 +23,10 @@ namespace aoc.aoc2023.day16
         {
             var data = new[]
             {
-                (r.Max.y * r.Width, r.Count, 1      ),
-                (0,                 r.Count, r.Width),
-                (0,                 r.Width, 1      ),
-                (r.Max.x,           r.Count, r.Width)
+                (r.Max.y * r.Width, r.Length, 1      ),
+                (0,                 r.Length, r.Width),
+                (0,                 r.Width,  1      ),
+                (r.Max.x,           r.Length, r.Width)
             };
             var tasks = new Task<int>[4];
             for (int i = 0; i < 4; i++)
@@ -62,7 +63,7 @@ namespace aoc.aoc2023.day16
         {
             var s = File.ReadAllText(path);
             r = VectorRange.FromField(s);
-            var dd = new uint[r.Count << 2];
+            var dd = new uint[r.Length << 2];
             Vector p = Vector.Zero;
             for (int i = 0, j = 0, h; i < s.Length; ++i, p += (1, 0))
                 if ((h = "|-./\n\\".IndexOf(s[i])) == 4)
@@ -80,8 +81,8 @@ namespace aoc.aoc2023.day16
             uint v = 0;
             foreach (var h in hh)
             {
-                Vector q = p + Vector.Headings[h];
-                v = r.IsMatch(q) ? v << 16 | (uint)((q.y * r.Width + q.x) << 2 | h) + 1 : v;
+                Vector q = p + Grid.Headings[h];
+                v = r.Contains(q) ? v << 16 | (uint)((q.y * r.Width + q.x) << 2 | h) + 1 : v;
             }
             return v;
         }
