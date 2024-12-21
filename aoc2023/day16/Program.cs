@@ -28,7 +28,7 @@ namespace aoc.aoc2023.day16
             if (!r.TryGetValue(a, p, out int m) ||
                 r.SetValue(a, p, m | 1 << h) == m)
                     return 0;
-            int i = "|-./?\\".IndexOf(p.GetChar(s));
+            int i = "|-./?\\".IndexOf(r.GetChar(s, p));
             h = i > 1 ? h ^ i - 2 : h;
             return (m == 0 ? 1 : 0) + (((h & 1) ^ 1) != i
                 ? Energize(p + Grid.Headings[h], h, s, a, r)
