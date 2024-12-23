@@ -1,5 +1,6 @@
 ﻿using aoc.Grids;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -19,19 +20,19 @@ namespace aoc.aoc2023.day21
 
         private static int Part1(bool[] bb, Vector start, Size t)
         {
-            var grid = new Grid(start);
+            var pp = new HashSet<Vector>() { start };
             int i = 0;
-            return Count(ref grid, ref i, Steps1, bb, t);
+            return Count(ref pp, ref i, Steps1, bb, t);
         }
 
         private static long Part2(bool[] bb, Vector start, Size t)
         {
-            var grid = new Grid(start);
+            var pp = new HashSet<Vector> { start };
             var x = Steps2 / t.width;
             var y = Steps2 % t.width;
             var cc = new long[3];
             for (int n = 0, i = 0; n < cc.Length; ++n)
-                cc[n] = Count(ref grid, ref i, n * t.width + y, bb, t);
+                cc[n] = Count(ref pp, ref i, n * t.width + y, bb, t);
             var c = cc[0];
             var aPlusB = cc[1] - c;
             var fourAPlusTwoB = cc[2] - c;
@@ -40,15 +41,15 @@ namespace aoc.aoc2023.day21
             return a * x * x + (aPlusB - a) * x + c;
         }
 
-        private static int Count(ref Grid grid, ref int i, int steps, bool[] bb, Size t)
+        private static int Count(ref HashSet<Vector> pp, ref int i, int steps, bool[] bb, Size t)
         {
             int dx = steps / t.width * t.width;
             int dy = steps / t.height * t.height;
             for (; i < steps; ++i)
-                grid = new(grid.SelectMany(grid.GetNeighbors)
+                pp = new(pp.SelectMany(Grid.GetNeighbors)
                     .AsParallel()
                     .Where(p => t.GetValue(bb, (Vector)((p.x + dx) % t.width, (p.y + dy) % t.height))));
-            return grid.Count;
+            return pp.Count;
         }
 
         private static bool[] Parse(string path, out Size t, out Vector start)
