@@ -48,7 +48,7 @@ namespace aoc.aoc2023.day21
             for (; i < steps; ++i)
                 pp = new(pp.SelectMany(Grid.GetNeighbors)
                     .AsParallel()
-                    .Where(p => t.GetValue(bb, (Vector)((p.x + dx) % t.width, (p.y + dy) % t.height))));
+                    .Where(p => t.GetValue(bb, (p + (dx, dy)) % (Vector)t)));
             return pp.Count;
         }
 
