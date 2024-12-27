@@ -12,7 +12,7 @@ namespace aoc.aoc2023.day25
             var count = BuildGraph(input, out var edges);
             var karger = new Karger(count, edges.ToArray());
             var result = karger.FindMinCut(3);
-            var part1 = result.Product;
+            var part1 = result.Size1 * result.Size2;
             Console.WriteLine(part1);
         }
 

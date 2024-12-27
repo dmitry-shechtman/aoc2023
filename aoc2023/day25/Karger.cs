@@ -91,7 +91,7 @@ namespace aoc.aoc2023.day25
                     : (root1, size1);
             }
 
-            return new(cut, size1 * size[root]);
+            return new(cut, size1, size[root]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
