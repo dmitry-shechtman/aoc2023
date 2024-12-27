@@ -82,16 +82,14 @@ namespace aoc.aoc2023.day25
                     Find(_edges[i].Target, parent) ? 0 : 1;
 
             // Find set sizes
-            int size1 = 0, root = -1, root1 = -1;
+            int root = -1, root1 = -1;
             for (int i = 0; i < _vertices && root == root1; i++)
             {
                 root = Find(i, parent);
-                (root1, size1) = root1 < 0
-                    ? (root, size[root])
-                    : (root1, size1);
+                root1 = root1 < 0 ? root : root1;
             }
 
-            return new(cut, size1, size[root]);
+            return new(cut, size[root], size[root1]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
