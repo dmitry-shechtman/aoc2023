@@ -56,8 +56,7 @@ namespace aoc.aoc2023.day22
             ((VectorRange)brick).Overlaps((VectorRange)brick2);
 
         private static Brick[] Parse(string path) =>
-            File.ReadAllLines(path)
-                .Select(Brick.Parse)
+            Brick.ParseAll(File.ReadAllText(path))
                 .OrderBy(r => r.Min.z)
                 .ToArray();
     }
