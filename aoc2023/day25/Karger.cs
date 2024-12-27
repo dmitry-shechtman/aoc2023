@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using System.Collections.Concurrent;
 
 namespace aoc.aoc2023.day25
 {
@@ -17,7 +15,7 @@ namespace aoc.aoc2023.day25
             _edges = edges;
         }
 
-        public Result FindMinCut()
+        public Result FindMinCut(int m)
         {
             // Calculate optimal number of iterations and batch size
             int totalIterations = (int)(Math.Log(_vertices) * _vertices / 2);
@@ -25,7 +23,7 @@ namespace aoc.aoc2023.day25
             int numBatches = (totalIterations + batchSize - 1) / batchSize;
 
             // Create concurrent bag to store results from all batches
-            var results = new ConcurrentBag<Result>();
+            Result final = default;
 
             // Process batches in parallel
             Parallel.For(0, numBatches, batchIndex =>
@@ -37,11 +35,17 @@ namespace aoc.aoc2023.day25
                 Span<int> size = stackalloc int[_vertices];
 
                 for (int i = 0; i < batch; i++)
-                    results.Add(RunKarger(parent, rank, size, new()));
+                {
+                    var result = RunKarger(parent, rank, size, new());
+                    if (result.CutSize > m)
+                        continue;
+                    lock (this)
+                        final = result;
+                    return;
+                }
             });
 
-            // Find best result across all batches
-            return results.MinBy(r => r.CutSize);
+            return final;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

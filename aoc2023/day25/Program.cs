@@ -11,7 +11,7 @@ namespace aoc.aoc2023.day25
             var input = File.ReadAllText("input.txt").Trim().Split('\n');
             var count = BuildGraph(input, out var edges);
             var karger = new Karger(count, edges.ToArray());
-            var result = karger.FindMinCut();
+            var result = karger.FindMinCut(3);
             var part1 = result.Product;
             Console.WriteLine(part1);
         }
