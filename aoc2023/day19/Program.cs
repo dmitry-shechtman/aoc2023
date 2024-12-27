@@ -56,16 +56,10 @@ namespace aoc.aoc2023.day19
 
         private static (string key, Rule[] rules) ParseWorkflow(string s)
         {
-            var values = GetValues(s);
+            var values = WorkflowRegex.GetAllValues(s);
             var key = values["key"][0];
             return (key, ParseRules(values));
         }
-
-        private static Dictionary<string, string[]> GetValues(string t) =>
-            WorkflowRegex.Match(t).Groups.Cast<Group>()
-                .ToDictionary(
-                    g => g.Name,
-                    g => g.Captures.Select(c => c.Value).ToArray());
 
         private static Rule[] ParseRules(Dictionary<string, string[]> values) =>
             values["dest"].Select((d, i) => ParseRule(d, values, i)).ToArray();
