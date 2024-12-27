@@ -18,14 +18,14 @@ namespace aoc.aoc2023.day21
             Console.WriteLine(Part2(bb, start, t));
         }
 
-        private static int Part1(bool[] bb, Vector start, Size t)
+        private static int Part1(BitSet bb, Vector start, Size t)
         {
             var pp = new HashSet<Vector>() { start };
             int i = 0;
             return Count(ref pp, ref i, Steps1, bb, t);
         }
 
-        private static long Part2(bool[] bb, Vector start, Size t)
+        private static long Part2(BitSet bb, Vector start, Size t)
         {
             var pp = new HashSet<Vector> { start };
             var x = Steps2 / t.width;
@@ -41,25 +41,25 @@ namespace aoc.aoc2023.day21
             return a * x * x + (aPlusB - a) * x + c;
         }
 
-        private static int Count(ref HashSet<Vector> pp, ref int i, int steps, bool[] bb, Size t)
+        private static int Count(ref HashSet<Vector> pp, ref int i, int steps, BitSet bb, Size t)
         {
             int dx = steps / t.width * t.width;
             int dy = steps / t.height * t.height;
             for (; i < steps; ++i)
                 pp = new(pp.SelectMany(Grid.GetNeighbors)
                     .AsParallel()
-                    .Where(p => t.GetValue(bb, (Vector)((p.x + dx) % t.width, (p.y + dy) % t.height))));
+                    .Where(p => bb[(p.x + dx) % t.width * t.width + (p.y + dy) % t.height]));
             return pp.Count;
         }
 
-        private static bool[] Parse(string path, out Size t, out Vector start)
+        private static BitSet Parse(string path, out Size t, out Vector start)
         {
             var s = File.ReadAllText(path);
             t = Size.FromField(s);
             start = t.FindChar(s, 'S');
-            return s.Replace("\n", "")
+            return new(s.Replace("\n", "")
                 .Select(c => c != '#')
-                .ToArray();
+                .ToArray());
         }
     }
 }
