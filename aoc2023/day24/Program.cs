@@ -151,8 +151,6 @@ namespace aoc.aoc2023.day24
             sb.AppendFormat("{0:x, y, z}", p);
 
         private static LongMatrix3D[] Parse(string path) =>
-            File.ReadAllLines(path)
-                .Select(s => LongMatrix3D.Parse(s, '@'))
-                .ToArray();
+            LongMatrix3D.ParseRowsAll(File.ReadAllText(path), 2);
     }
 }
