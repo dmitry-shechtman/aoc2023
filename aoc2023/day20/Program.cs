@@ -22,10 +22,6 @@ namespace aoc.aoc2023.day20
             (state & Mask) != Mask;
     }
 
-    record FlipFlopModule(long DestMask, long Mask) : StateModule(DestMask, Mask);
-
-    record ConjunctionModule(long DestMask, long Mask) : StateModule(DestMask, Mask);
-
     sealed class LongState
     {
         public LongState(long flipMask, long conjMask)
@@ -121,8 +117,8 @@ namespace aoc.aoc2023.day20
 
         private static Module CreateModule(int index, string key, long destMask, List<(string key, string[] dests)> tuples) => key[0] switch
         {
-            FlipFlopPrefix    => new FlipFlopModule(destMask, 1L << index),
-            ConjunctionPrefix => new ConjunctionModule(destMask, GetSourceMask(GetKey(key), tuples)),
+            FlipFlopPrefix    => new StateModule(destMask, 1L << index),
+            ConjunctionPrefix => new StateModule(destMask, GetSourceMask(GetKey(key), tuples)),
             _ => new RelayModule(destMask),
         };
 
