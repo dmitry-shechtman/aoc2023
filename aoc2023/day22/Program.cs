@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -56,7 +57,7 @@ namespace aoc.aoc2023.day22
             ((VectorRange)brick).Overlaps((VectorRange)brick2);
 
         private static Brick[] Parse(string path) =>
-            Brick.ParseAll(File.ReadAllText(path))
+            Brick.ParseAll(File.ReadAllText(path), CultureInfo.InvariantCulture)
                 .OrderBy(r => r.Min.z)
                 .ToArray();
     }

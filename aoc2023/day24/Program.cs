@@ -1,5 +1,6 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -147,6 +148,6 @@ namespace aoc.aoc2023.day24
             sb.AppendFormat("{0:x, y, z}", p);
 
         private static DoubleMatrix3D[] Parse(string path) =>
-            DoubleMatrix3D.ParseRowsAll(File.ReadAllText(path), 2);
+            DoubleMatrix3D.ParseRowsAll(File.ReadAllText(path), CultureInfo.InvariantCulture, 2);
     }
 }
