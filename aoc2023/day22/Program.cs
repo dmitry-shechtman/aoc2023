@@ -35,7 +35,7 @@ namespace aoc.aoc2023.day22
 
         private static int GetHeight(Brick brick, Brick[] bricks) =>
             bricks.Where(b => Below(b, brick))
-                .TryMin(b => brick.Min.z - b.Max.z, brick.Min.z) - 1;
+                .MinOrDefault(b => brick.Min.z - b.Max.z, brick.Min.z) - 1;
 
         private static int CountSupports(Graph<bool> graph, int i) =>
             graph.Outgoing[i].Keys
