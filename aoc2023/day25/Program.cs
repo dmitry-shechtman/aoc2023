@@ -24,18 +24,11 @@ namespace aoc.aoc2023.day25
             {
                 var split = line.Split(':', StringSplitOptions.TrimEntries);
                 var v = split[0];
-                var index = vertices.GetOrAdd(v);
+                var index = vertices.GetOrAdd(v, vertices.Count);
                 foreach (var u in split[1].Split(' '))
-                    edges.Add(new(index, vertices.GetOrAdd(u)));
+                    edges.Add(new(index, vertices.GetOrAdd(u, vertices.Count)));
             }
             return vertices.Count;
-        }
-
-        private static int GetOrAdd(this Dictionary<string, int> vertices, string v)
-        {
-            if (!vertices.TryGetValue(v, out var index))
-                vertices.Add(v, index = vertices.Count);
-            return index;
         }
     }
 }
