@@ -23,9 +23,6 @@ namespace aoc.aoc2023.day19
         private static readonly Regex WorkflowRegex = new(
             @"^(?<key>[a-z]+)\{((?<coord>[xmas])(?<op>[<>])(?<value>\d+):(?<dest>R|A|[a-z]+),)+(?<dest>R|A|[a-z]+)\}$");
 
-        private static readonly Regex PartRegex = new(
-            @"^\{x=(\d+),m=(\d+),a=(\d+),s=(\d+)\}$");
-
         static void Main(string[] args)
         {
             Parse(args[0], out var workflows, out var parts);
@@ -89,6 +86,6 @@ namespace aoc.aoc2023.day19
             Enumerable.Range(0, Cardinality).Select(i => i == coord ? value : defaultValue).ToArray();
 
         private static Part[] ParseParts(string s) =>
-            s.Split('\n').Select(t => Part.Builder.Parse(t, PartRegex, CultureInfo.InvariantCulture)).ToArray();
+            Part.Builder.ParseAll(s, CultureInfo.InvariantCulture);
     }
 }
