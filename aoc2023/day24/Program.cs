@@ -148,6 +148,6 @@ namespace aoc.aoc2023.day24
             sb.AppendFormat("{0:x, y, z}", p);
 
         private static DoubleMatrix3D[] Parse(string path) =>
-            DoubleMatrix3D.ParseRowsAll(File.ReadAllText(path), CultureInfo.InvariantCulture, 2);
+            DoubleMatrix3D.Rows.ParseAll(File.ReadAllText(path), CultureInfo.InvariantCulture, 2);
     }
 }

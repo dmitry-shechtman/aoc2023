@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -88,6 +89,6 @@ namespace aoc.aoc2023.day19
             Enumerable.Range(0, Cardinality).Select(i => i == coord ? value : defaultValue).ToArray();
 
         private static Part[] ParseParts(string s) =>
-            s.Split('\n').Select(t => Part.Parse(t, PartRegex)).ToArray();
+            s.Split('\n').Select(t => Part.Builder.Parse(t, PartRegex, CultureInfo.InvariantCulture)).ToArray();
     }
 }
