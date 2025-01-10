@@ -30,7 +30,7 @@ namespace aoc.aoc2023.day18
         }
 
         private static Vector[] Parse1(string[] ss) =>
-            Grid.ParsePath(ss, ' ')
+            Grid.Path.Parse(ss, ' ')
                 .Select(t => t.v * t.d)
                 .ToArray();
 
