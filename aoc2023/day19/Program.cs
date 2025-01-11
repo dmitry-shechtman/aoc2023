@@ -20,7 +20,7 @@ namespace aoc.aoc2023.day19
 
         private static readonly PartRange DefaultRange = CreateRange(-1, (MinValue, MaxValue));
 
-        private static readonly Regex WorkflowRegex = new(
+        private static readonly Regex Regex = new(
             @"^(?<key>[a-z]+)\{((?<coord>[xmas])(?<op>[<>])(?<value>\d+):(?<dest>R|A|[a-z]+),)+(?<dest>R|A|[a-z]+)\}$");
 
         static void Main(string[] args)
@@ -54,7 +54,7 @@ namespace aoc.aoc2023.day19
 
         private static (string key, Rule[] rules) ParseWorkflow(string s)
         {
-            var values = WorkflowRegex.GetAllValues(s);
+            var values = Regex.GetAllValues(s, 2..);
             var key = values["key"][0];
             return (key, ParseRules(values));
         }
