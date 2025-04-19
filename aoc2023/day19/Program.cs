@@ -11,26 +11,30 @@ namespace aoc.aoc2023.day19
     using PartRange = Vector4DRange;
     using Workflows = Dictionary<string, Rule[]>;
 
-    record Rule(string Dest, PartRange Range);
+    readonly record struct Rule(string Dest, PartRange Range);
 
     class Program
     {
         private const int Cardinality = 4, MinValue  =   1, MaxValue  = 4000;
         private const string InKey = "in", RejectKey = "R", AcceptKey =  "A";
 
-        private static readonly PartRange DefaultRange = CreateRange(-1, (MinValue, MaxValue));
+        private static readonly PartRange DefaultRange = new(MinValue, MaxValue);
 
         private static readonly Regex Regex = new(
-            @"^(?<key>[a-z]+)\{((?<coord>[xmas])(?<op>[<>])(?<value>\d+):(?<dest>R|A|[a-z]+),)+(?<dest>R|A|[a-z]+)\}$");
+            @"^(?<key>[a-z]+){((?<coord>[xmas])(?<op>[<>])(?<value>\d+):(?<dest>R|A|[a-z]+),)+(?<dest>R|A|[a-z]+)}$");
 
         static void Main(string[] args)
         {
             Parse(args[0], out var workflows, out var parts);
             Console.WriteLine(Part1(workflows, parts));
+            Console.WriteLine(Part2(workflows));
         }
 
         private static int Part1(Workflows workflows, Part[] parts) =>
             parts.Sum(p => Process(InKey, p, workflows));
+
+        private static long Part2(Workflows workflows) =>
+            Process(InKey, DefaultRange, workflows);
 
         private static int Process(string key, Part part, Workflows workflows) =>
             Process(workflows[key].First(r => r.Range.Contains(part)), part, workflows);
@@ -40,6 +44,21 @@ namespace aoc.aoc2023.day19
             RejectKey => 0,
             AcceptKey => part.Abs(),
             _ => Process(rule.Dest, part, workflows),
+        };
+
+        private static long Process(string key, PartRange range, Workflows workflows) =>
+            workflows[key].Aggregate(
+                (length: 0L, seen: Enumerable.Empty<PartRange>()),
+                (a, rule) => rule.Range.Intersect(range, out var source)
+                    ? (a.length + source.Subtract(a.seen).Sum(target => Process(rule, target, workflows)), a.seen.Append(source))
+                    : a)
+            .length;
+
+        private static long Process(Rule rule, PartRange range, Workflows workflows) => rule.Dest switch
+        {
+            RejectKey => 0,
+            AcceptKey => range.LongLength,
+            _ => Process(rule.Dest, range, workflows)
         };
 
         private static void Parse(string path, out Workflows workflows, out Part[] parts)
